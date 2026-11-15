@@ -27,6 +27,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ClipboardManager;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,15 +40,18 @@ import android.content.res.XmlResourceParser;
 import android.inputmethodservice.InputMethodService;
 import android.media.AudioManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.SystemClock;
 import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -119,7 +124,6 @@ public class LatinIME extends InputMethodService implements
     static final String PREF_FORCE_KEYBOARD_ON = "force_keyboard_on";
     static final String PREF_KEYBOARD_NOTIFICATION = "keyboard_notification";
     static final String PREF_CONNECTBOT_TAB_HACK = "connectbot_tab_hack";
-    static final String PREF_FULL_KEYBOARD_IN_PORTRAIT = "full_keyboard_in_portrait";
     static final String PREF_SUGGESTIONS_IN_LANDSCAPE = "suggestions_in_landscape";
     static final String PREF_HEIGHT_PORTRAIT = "settings_height_portrait";
     static final String PREF_HEIGHT_LANDSCAPE = "settings_height_landscape";
@@ -262,7 +266,22 @@ public class LatinIME extends InputMethodService implements
     private ComposeSequence mComposeBuffer = new ComposeSequence(this);
     private ComposeSequence mDeadAccentBuffer = new DeadAccentSequence(this);
 
+    /** Key outline styles, see key_style_values in strings.xml. */
+    public static final int KEY_STYLE_FLAT = 0;
+    public static final int KEY_STYLE_OUTLINED = 1;
+    public static final int KEY_STYLE_RAISED = 2;
+
     private AudioManager mAudioManager;
+    private KeySoundPlayer mKeySoundPlayer;
+    private static final int SPOKEN_PROFILE = 11;
+    private static final int MACRO_KEY = -150;
+    private static final int GAMEPAD_KEY = -151;
+    private final StringBuilder mSpokenWord = new StringBuilder();
+    private ClipboardManager mClipboard;
+    private ClipboardManager.OnPrimaryClipChangedListener mClipListener;
+    private TextToSpeech mTts;
+    private boolean mTtsReady;
+    private boolean mSpeakKeys;
     // Align sound effect volume on music volume
     private final float FX_VOLUME = -1.0f;
     private final float FX_VOLUME_RANGE_DB = 72.0f;
@@ -412,7 +431,8 @@ public class LatinIME extends InputMethodService implements
         pFilter.addAction("android.intent.action.PACKAGE_ADDED");
         pFilter.addAction("android.intent.action.PACKAGE_REPLACED");
         pFilter.addAction("android.intent.action.PACKAGE_REMOVED");
-        registerReceiver(mPluginManager, pFilter);
+        ContextCompat.registerReceiver(this, mPluginManager, pFilter,
+                ContextCompat.RECEIVER_NOT_EXPORTED);
 
         LatinIMEUtil.GCUtils.getInstance().reset();
         boolean tryGC = true;
@@ -431,7 +451,8 @@ public class LatinIME extends InputMethodService implements
         // register to receive ringer mode changes for silent mode
         IntentFilter filter = new IntentFilter(
                 AudioManager.RINGER_MODE_CHANGED_ACTION);
-        registerReceiver(mReceiver, filter);
+        ContextCompat.registerReceiver(this, mReceiver, filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED);
         prefs.registerOnSharedPreferenceChangeListener(this);
         setNotification(mKeyboardNotification);
     }
@@ -489,17 +510,21 @@ public class LatinIME extends InputMethodService implements
             mNotificationReceiver = new NotificationReceiver(this);
             final IntentFilter pFilter = new IntentFilter(NotificationReceiver.ACTION_SHOW);
             pFilter.addAction(NotificationReceiver.ACTION_SETTINGS);
-            registerReceiver(mNotificationReceiver, pFilter);
+            ContextCompat.registerReceiver(this, mNotificationReceiver, pFilter,
+                    ContextCompat.RECEIVER_NOT_EXPORTED);
             
             Intent notificationIntent = new Intent(NotificationReceiver.ACTION_SHOW);
-            PendingIntent contentIntent = PendingIntent.getBroadcast(getApplicationContext(), 1, notificationIntent, 0);
+            PendingIntent contentIntent = PendingIntent.getBroadcast(getApplicationContext(), 1,
+                    notificationIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             //PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
             Intent configIntent = new Intent(NotificationReceiver.ACTION_SETTINGS);
             PendingIntent configPendingIntent =
-                    PendingIntent.getBroadcast(getApplicationContext(), 2, configIntent, 0);
+                    PendingIntent.getBroadcast(getApplicationContext(), 2, configIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-            String title = "Show Hacker's Keyboard";
+            String title = "Show HACK3RS K3YB0ARD 3.0";
             String body = "Select this to open the keyboard. Disable in settings.";
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
@@ -532,7 +557,12 @@ public class LatinIME extends InputMethodService implements
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 
             // notificationId is a unique int for each notification that you must define
-            notificationManager.notify(NOTIFICATION_ONGOING_ID, mBuilder.build());
+            try {
+                notificationManager.notify(NOTIFICATION_ONGOING_ID, mBuilder.build());
+            } catch (SecurityException e) {
+                // POST_NOTIFICATIONS not granted on Android 13+; the keyboard still works.
+                Log.w("PCKeyboard", "Notification permission missing, skipping status notification");
+            }
 
         } else if (mNotificationReceiver != null) {
             mNotificationManager.cancel(NOTIFICATION_ONGOING_ID);
@@ -648,6 +678,19 @@ public class LatinIME extends InputMethodService implements
         if (mUserDictionary != null) {
             mUserDictionary.close();
         }
+        if (mKeySoundPlayer != null) {
+            mKeySoundPlayer.release();
+            mKeySoundPlayer = null;
+        }
+        if (mClipboard != null && mClipListener != null) {
+            mClipboard.removePrimaryClipChangedListener(mClipListener);
+            mClipListener = null;
+        }
+        if (mTts != null) {
+            mTts.shutdown();
+            mTts = null;
+            mTtsReady = false;
+        }
         //if (mContactsDictionary != null) {
         //    mContactsDictionary.close();
         //}
@@ -701,7 +744,27 @@ public class LatinIME extends InputMethodService implements
         mKeyboardSwitcher.makeKeyboards(true);
         mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_TEXT, 0,
                 shouldShowVoiceButton(getCurrentInputEditorInfo()));
-        return mKeyboardSwitcher.getInputView();
+        View inputView = mKeyboardSwitcher.getInputView();
+        applyOneHanded(inputView);
+        return inputView;
+    }
+
+    /** Narrows the keyboard to one side so it can be reached with one thumb. */
+    private void applyOneHanded(View view) {
+        if (view == null) return;
+        String mode = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("pref_one_handed", "off");
+        int pad = 0;
+        if ("left".equals(mode) || "right".equals(mode)) {
+            pad = (int) (getResources().getDisplayMetrics().widthPixels * 0.24f);
+        }
+        if ("left".equals(mode)) {
+            view.setPadding(0, view.getPaddingTop(), pad, view.getPaddingBottom());
+        } else if ("right".equals(mode)) {
+            view.setPadding(pad, view.getPaddingTop(), 0, view.getPaddingBottom());
+        } else {
+            view.setPadding(0, view.getPaddingTop(), 0, view.getPaddingBottom());
+        }
     }
 
     @Override
@@ -760,6 +823,19 @@ public class LatinIME extends InputMethodService implements
     
     @Override
     public void onStartInputView(EditorInfo attribute, boolean restarting) {
+        int ruleTheme = AppThemeRules.themeFor(this, attribute.packageName);
+        int globalTheme;
+        try {
+            globalTheme = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("pref_keyboard_layout", "8"));
+        } catch (RuntimeException e) {
+            globalTheme = 8;
+        }
+        int targetTheme = ruleTheme >= 0 ? ruleTheme : globalTheme;
+        if (mKeyboardSwitcher != null && mKeyboardSwitcher.getLayoutId() != targetTheme) {
+            mKeyboardSwitcher.setLayout(targetTheme);
+        }
+        captureCurrentClip();
         sKeyboardSettings.editorPackageName = attribute.packageName;
         sKeyboardSettings.editorFieldName = attribute.fieldName;
         sKeyboardSettings.editorFieldId = attribute.fieldId;
@@ -772,6 +848,9 @@ public class LatinIME extends InputMethodService implements
         if (inputView == null) {
             return;
         }
+        // Tuning must be applied after the view exists, otherwise a restarted
+        // keyboard would keep the height/radius/dim of the previous view.
+        applyTuning();
 
         if (mRefreshKeyboardRequired) {
             mRefreshKeyboardRequired = false;
@@ -1464,7 +1543,10 @@ public class LatinIME extends InputMethodService implements
             // Input method selector is available as a button in the soft key area, so just launch
             // HK settings directly. This also works around the alert dialog being clipped
             // in Android O.
-            startActivity(new Intent(this, LatinIMESettings.class));
+            // The IME service is not an Activity, so the intent needs its own task.
+            Intent settings = new Intent(this, LatinIMESettings.class);
+            settings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(settings);
         } else {
             // Show an options menu with choices to change input method or open HK settings.
             if (!isShowingOptionDialog()) {
@@ -1481,6 +1563,22 @@ public class LatinIME extends InputMethodService implements
 
     private boolean isShowingOptionDialog() {
         return mOptionsDialog != null && mOptionsDialog.isShowing();
+    }
+
+    private static final String[] TERMINAL_PACKAGES = {
+            "org.connectbot", "com.termius.dbru", "com.termius", "com.sonelli.juicessh",
+            "com.juicessh", "com.speedsoftware.rootexplorer", "ru.meefik.linuxdeploy"
+    };
+
+    /** Terminal apps must never have their commands "corrected". */
+    private boolean isTerminalPackage(String pkg) {
+        if (pkg == null) return false;
+        String lower = pkg.toLowerCase(Locale.US);
+        if (lower.contains("termux") || lower.contains("terminal")) return true;
+        for (String terminal : TERMINAL_PACKAGES) {
+            if (lower.equals(terminal) || lower.startsWith(terminal + ".")) return true;
+        }
+        return false;
     }
 
     private boolean isConnectbot() {
@@ -1935,6 +2033,15 @@ public class LatinIME extends InputMethodService implements
     // Implementation of KeyboardViewListener
 
     public void onKey(int primaryCode, int[] keyCodes, int x, int y) {
+        mSpeakKeys = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("pref_speak_keys", false);
+        speakKey(primaryCode);
+        if (primaryCode == ASCII_SPACE) {
+            ContextModel.learn(this);
+            if (SnippetStore.expand(this)) {
+                return;
+            }
+        }
         long when = SystemClock.uptimeMillis();
         if (primaryCode != Keyboard.KEYCODE_DELETE
                 || when > mLastKeyTime + QUICK_PRESS) {
@@ -1989,6 +2096,12 @@ public class LatinIME extends InputMethodService implements
             if (!isShowingOptionDialog()) {
                 handleClose();
             }
+            break;
+        case MACRO_KEY:
+            MacroPanel.show(this, mKeyboardSwitcher.getInputView());
+            break;
+        case GAMEPAD_KEY:
+            GamepadPanel.show(this, mKeyboardSwitcher.getInputView());
             break;
         case LatinKeyboardView.KEYCODE_OPTIONS:
             onOptionKeyPressed();
@@ -2535,6 +2648,26 @@ public class LatinIME extends InputMethodService implements
                 getCurrentInputConnection(), mWordSeparators);
         List<CharSequence> stringList = mSuggest.getSuggestions(
                 mKeyboardSwitcher.getInputView(), word, false, prevWord);
+        int contextStrength = 1;
+        try {
+            contextStrength = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("pref_autocorrect_strength", "1"));
+        } catch (RuntimeException ignored) {
+            // default strength
+        }
+        if (contextStrength >= 1 && prevWord != null && stringList != null) {
+            List<CharSequence> predicted = ContextModel.predict(this, prevWord.toString());
+            try {
+                for (int i = predicted.size() - 1; i >= 0; i--) {
+                    CharSequence candidate = predicted.get(i);
+                    if (!stringList.contains(candidate)) {
+                        stringList.add(0, candidate);
+                    }
+                }
+            } catch (UnsupportedOperationException ignored) {
+                // read-only suggestion list: skip context additions
+            }
+        }
         // long stopTime = System.currentTimeMillis(); // TIME MEASUREMENT!
         // Log.d("LatinIME","Suggest Total Time - " + (stopTime - startTime));
 
@@ -3042,6 +3175,20 @@ public class LatinIME extends InputMethodService implements
         if (needReload) {
             mKeyboardSwitcher.makeKeyboards(true);
         }
+        // Visual preferences are read while drawing, so the live view only needs a
+        // refresh. Applying them here makes changes show up immediately instead of
+        // waiting for the next input session.
+        if (VISUAL_PREFS.contains(key)) {
+            applyTuning();
+            LatinKeyboardView view = mKeyboardSwitcher.getInputView();
+            if (view != null) {
+                view.invalidateAllKeys();
+                view.postInvalidateOnAnimation();
+            }
+        }
+        if ("pref_one_handed".equals(key)) {
+            applyOneHanded(mKeyboardSwitcher.getInputView());
+        }
     }
 
     private boolean doSwipeAction(String action) {
@@ -3076,6 +3223,8 @@ public class LatinIME extends InputMethodService implements
                 mKeyboardModeOverrideLandscape = (mKeyboardModeOverrideLandscape + 1) % mNumKeyboardModes;
             }
             toggleLanguage(true, true);
+        } else if (action.equals("clipboard")) {
+            ClipboardPanel.show(this, mKeyboardSwitcher.getInputView());
         } else if (action.equals("extension")) {
             sKeyboardSettings.useExtension = !sKeyboardSettings.useExtension;
             reloadKeyboards();
@@ -3274,7 +3423,162 @@ public class LatinIME extends InputMethodService implements
         return vol;
     }
     
+    /** Pulls in whatever was copied while the keyboard was in another app. */
+    private void captureCurrentClip() {
+        if (mClipboard == null) {
+            mClipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        }
+        if (mClipboard == null || !mClipboard.hasPrimaryClip()) return;
+        ClipData clip = mClipboard.getPrimaryClip();
+        if (clip == null || clip.getItemCount() == 0) return;
+        CharSequence text = clip.getItemAt(0).coerceToText(this);
+        if (text != null && text.length() > 0) {
+            ClipboardHistory.add(this, text.toString());
+        }
+    }
+
+    /** Plays a macro: literal text is committed, {keys} are sent as key events. */
+    public void runMacro(MacroStore.Macro macro) {
+        InputConnection ic = getCurrentInputConnection();
+        if (ic == null || macro == null) return;
+        for (String rawStep : macro.steps.split("\\|")) {
+            String step = rawStep.trim();
+            if (step.isEmpty()) continue;
+            int code = macroKeyCode(step.toLowerCase(Locale.US));
+            if (code > 0) {
+                ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, code));
+                ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, code));
+            } else {
+                ic.commitText(step, 1);
+            }
+        }
+    }
+
+    private static int macroKeyCode(String step) {
+        switch (step) {
+            case "{enter}": return KeyEvent.KEYCODE_ENTER;
+            case "{tab}": return KeyEvent.KEYCODE_TAB;
+            case "{esc}": return KeyEvent.KEYCODE_ESCAPE;
+            case "{backspace}": case "{del}": return KeyEvent.KEYCODE_DEL;
+            case "{left}": return KeyEvent.KEYCODE_DPAD_LEFT;
+            case "{right}": return KeyEvent.KEYCODE_DPAD_RIGHT;
+            case "{up}": return KeyEvent.KEYCODE_DPAD_UP;
+            case "{down}": return KeyEvent.KEYCODE_DPAD_DOWN;
+            case "{home}": return KeyEvent.KEYCODE_MOVE_HOME;
+            case "{end}": return KeyEvent.KEYCODE_MOVE_END;
+            case "{space}": return KeyEvent.KEYCODE_SPACE;
+            default: return -1;
+        }
+    }
+
+    /** Preferences that change what the keyboard looks like without a rebuild. */
+    private static final java.util.Set<String> VISUAL_PREFS = new java.util.HashSet<>(
+            java.util.Arrays.asList(
+                    "pref_key_height_scale", "pref_key_radius", "pref_background_dim",
+                    "pref_key_opacity", "pref_key_shadow", "pref_key_effect",
+                    BackgroundImages.PREF, "pref_key_style", "pref_key_font",
+                    "pref_key_text_color", "pref_key_glyphs", "pref_key_bold",
+                    "pref_key_tracking"));
+
+    /** Reads the persisted tuning prefs and applies them to the live keyboard. */
+    private void applyTuning() {
+        if (mKeyboardSwitcher == null) return;
+        LatinKeyboardView view = mKeyboardSwitcher.getInputView();
+        if (view == null) return;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        TuningValues tuning = TuningValues.fromStrings(
+                prefs.getString("pref_key_height_scale", "1.0"),
+                prefs.getString("pref_key_radius", "10"),
+                prefs.getString("pref_background_dim", "0"),
+                prefs.getString("pref_key_opacity", "100"),
+                prefs.getString("pref_key_shadow", "100"));
+        view.applyCustomization(tuning.heightScale, tuning.radiusDp, tuning.backgroundDim);
+        view.applyKeyOpacity(tuning.keyOpacity);
+        view.applyKeyShadow(tuning.keyShadow);
+        int backgroundIndex = BackgroundImages.selected(this);
+        int backgroundRes = BackgroundImages.drawableFor(backgroundIndex);
+        view.applyBackgroundImage(backgroundRes == 0 ? null
+                : getResources().getDrawable(backgroundRes, getTheme()));
+    }
+
+    private void initTts() {
+        if (mTts != null) return;
+        mTts = new TextToSpeech(this, status -> {
+            mTtsReady = status == TextToSpeech.SUCCESS;
+            if (mTtsReady && mTts != null) {
+                mTts.setLanguage(Locale.getDefault());
+            }
+        });
+    }
+
+    /** Speaks the key that was just pressed, when "Speak keys" is enabled. */
+    private float speechVolume() {
+        try {
+            String value = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("pref_speak_volume", "1.0");
+            return Float.parseFloat(value);
+        } catch (RuntimeException e) {
+            return 1f;
+        }
+    }
+
+    private boolean speechModeOn() {
+        return mSpeakKeys || (LatinIME.sKeyboardSettings != null
+                && LatinIME.sKeyboardSettings.keySoundProfile == SPOKEN_PROFILE);
+    }
+
+    private void speakKey(int primaryCode) {
+        if (!speechModeOn()) return;
+        if (mTts == null) {
+            initTts();
+            return;
+        }
+        if (!mTtsReady) return;
+
+        boolean speakWords = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("pref_speak_words", false);
+        if (speakWords) {
+            if (primaryCode == ASCII_SPACE || primaryCode == ASCII_ENTER || primaryCode == 10) {
+                if (mSpokenWord.length() > 0) {
+                    Bundle params = new Bundle();
+                    params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, speechVolume());
+                    mTts.speak(mSpokenWord.toString(), TextToSpeech.QUEUE_FLUSH, params, "hkw");
+                    mSpokenWord.setLength(0);
+                }
+            } else if (primaryCode >= 33 && primaryCode < 127) {
+                mSpokenWord.append((char) primaryCode);
+            } else if (primaryCode == Keyboard.KEYCODE_DELETE && mSpokenWord.length() > 0) {
+                mSpokenWord.deleteCharAt(mSpokenWord.length() - 1);
+            }
+            return;
+        }
+
+        String text = null;
+        if (primaryCode >= 33 && primaryCode < 127) {
+            text = String.valueOf((char) primaryCode);
+        } else if (primaryCode == Keyboard.KEYCODE_DELETE) {
+            text = "backspace";
+        } else if (primaryCode == ASCII_ENTER) {
+            text = "enter";
+        } else if (primaryCode == ASCII_SPACE) {
+            text = "space";
+        } else if (primaryCode == Keyboard.KEYCODE_SHIFT) {
+            // "shift" alone is easily misheard; the caps key says what it does.
+            text = (sKeyboardSettings != null && sKeyboardSettings.capsLock)
+                    ? "caps lock" : "shift";
+        } else if (primaryCode == LatinKeyboardView.KEYCODE_CAPS_LOCK) {
+            text = "caps lock";
+        }
+        if (text != null) {
+            Bundle params = new Bundle();
+            params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, speechVolume());
+            mTts.speak(text, TextToSpeech.QUEUE_ADD, params, "hk");
+        }
+    }
+
     private void playKeyClick(int primaryCode) {
+        mSpeakKeys = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("pref_speak_keys", false);
         // if mAudioManager is null, we don't have the ringer state yet
         // mAudioManager will be set by updateRingerMode
         if (mAudioManager == null) {
@@ -3285,6 +3589,23 @@ public class LatinIME extends InputMethodService implements
         if (mSoundOn && !mSilentMode) {
             // FIXME: Volume and enable should come from UI settings
             // FIXME: These should be triggered after auto-repeat logic
+            final float clickVolume = getKeyClickVolume();
+            final int profile = sKeyboardSettings.keySoundProfile;
+            if (profile != KeySoundPlayer.PROFILE_SYSTEM) {
+                if (mKeySoundPlayer == null) {
+                    mKeySoundPlayer = new KeySoundPlayer(this);
+                }
+                int kind = KeySoundPlayer.KIND_KEY;
+                if (primaryCode == Keyboard.KEYCODE_DELETE) {
+                    kind = KeySoundPlayer.KIND_DELETE;
+                } else if (primaryCode == ASCII_ENTER) {
+                    kind = KeySoundPlayer.KIND_ENTER;
+                } else if (primaryCode == ASCII_SPACE) {
+                    kind = KeySoundPlayer.KIND_SPACE;
+                }
+                mKeySoundPlayer.play(profile, kind, clickVolume);
+                return;
+            }
             int sound = AudioManager.FX_KEYPRESS_STANDARD;
             switch (primaryCode) {
             case Keyboard.KEYCODE_DELETE:
@@ -3297,7 +3618,7 @@ public class LatinIME extends InputMethodService implements
                 sound = AudioManager.FX_KEYPRESS_SPACEBAR;
                 break;
             }
-            mAudioManager.playSoundEffect(sound, getKeyClickVolume());
+            mAudioManager.playSoundEffect(sound, clickVolume);
         }
     }
 
@@ -3346,6 +3667,26 @@ public class LatinIME extends InputMethodService implements
                         : Suggest.CORRECTION_NONE);
         mCorrectionMode = (mBigramSuggestionEnabled && mAutoCorrectOn && mAutoCorrectEnabled) ? Suggest.CORRECTION_FULL_BIGRAM
                 : mCorrectionMode;
+        int strength = 1;
+        try {
+            String value = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("pref_autocorrect_strength", "1");
+            strength = Integer.parseInt(value);
+        } catch (RuntimeException ignored) {
+            // keep the default strength
+        }
+        if (strength == 0) {
+            mAutoCorrectOn = false;
+            mCorrectionMode = Suggest.CORRECTION_NONE;
+        } else if (strength >= 2 && mAutoCorrectOn) {
+            mCorrectionMode = Suggest.CORRECTION_FULL_BIGRAM;
+        }
+        boolean terminalSafe = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("pref_terminal_safe", true);
+        if (terminalSafe && isTerminalPackage(sKeyboardSettings.editorPackageName)) {
+            mAutoCorrectOn = false;
+            mCorrectionMode = Suggest.CORRECTION_NONE;
+        }
         if (suggestionsDisabled()) {
             mAutoCorrectOn = false;
             mCorrectionMode = Suggest.CORRECTION_NONE;
@@ -3368,21 +3709,23 @@ public class LatinIME extends InputMethodService implements
     }
 
     protected void launchSettings(
-            Class<? extends PreferenceActivity> settingsClass) {
-        handleClose();
+            Class<? extends android.app.Activity> settingsClass) {
         Intent intent = new Intent();
         intent.setClass(LatinIME.this, settingsClass);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        // Launch while the keyboard window is still visible: once it is dismissed the
+        // input method counts as background and Android blocks the activity start.
         startActivity(intent);
+        handleClose();
     }
 
     private void loadSettings() {
         // Get the settings preferences
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(this);
-        mVibrateOn = sp.getBoolean(PREF_VIBRATE_ON, false);
+        mVibrateOn = sp.getBoolean(PREF_VIBRATE_ON, true);
         mVibrateLen = getPrefInt(sp, PREF_VIBRATE_LEN, getResources().getString(R.string.vibrate_duration_ms));
-        mSoundOn = sp.getBoolean(PREF_SOUND_ON, false);
+        mSoundOn = sp.getBoolean(PREF_SOUND_ON, true);
         mPopupOn = sp.getBoolean(PREF_POPUP_ON, mResources
                 .getBoolean(R.bool.default_popup_preview));
         mAutoCapPref = sp.getBoolean(PREF_AUTO_CAP, getResources().getBoolean(

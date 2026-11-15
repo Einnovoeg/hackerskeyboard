@@ -51,6 +51,15 @@ public final class GlobalKeyboardSettings {
     public int chordingMetaKey = 0;
     public float keyClickVolume = 0.0f;
     public int keyClickMethod = 0;
+    public int keySoundProfile = 0;
+    public int keyStyle = 1;
+    public int keyFont = 0;
+    public int keyTextColor = 0;
+    public int keyGlyphs = 0;
+    public int keyEffect = 0;
+    public boolean keyBold = false;
+    public float keyTracking = 0f;
+    public int keyboardTheme = 0;
     public boolean capsLock = true;
     public boolean shiftLockModifiers = false;
     //
@@ -67,6 +76,8 @@ public final class GlobalKeyboardSettings {
     //
     // Read by KeyboardSwitcher
     public int keyboardMode = 0;
+    /** 0 = QWERTY, 1 = AZERTY, 2 = Dvorak; selects the full-mode letter layout. */
+    public int keyboardLayout = 0;
     public boolean useExtension = false;
     //
     // Read by LatinKeyboardView and KeyboardSwitcher
@@ -131,6 +142,14 @@ public final class GlobalKeyboardSettings {
             public void set(String val) { keyboardModeLandscape = Integer.valueOf(val); }
             public String getDefault() { return res.getString(R.string.default_keyboard_mode_landscape); }
             public int getFlags() { return FLAG_PREF_RESET_KEYBOARDS | FLAG_PREF_RESET_MODE_OVERRIDE; }
+        });
+
+        addStringPref("pref_key_layout", new StringPref() {
+            public void set(String val) { keyboardLayout = Integer.valueOf(val); }
+            public String getDefault() { return "0"; }
+            // A different layout means different key files, so drop the cached keyboards
+            // and rebuild the view that shows them.
+            public int getFlags() { return FLAG_PREF_RESET_KEYBOARDS | FLAG_PREF_RECREATE_INPUT_VIEW; }
         });
 
         addStringPref("pref_slide_keys_int", new StringPref() {
@@ -208,6 +227,60 @@ public final class GlobalKeyboardSettings {
         addStringPref("pref_click_method", new StringPref() {
             public void set(String val) { keyClickMethod = Integer.valueOf(val); }
             public String getDefault() { return res.getString(R.string.default_click_method); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_style", new StringPref() {
+            public void set(String val) { keyStyle = Integer.valueOf(val); }
+            public String getDefault() { return res.getString(R.string.default_key_style); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_font", new StringPref() {
+            public void set(String val) { keyFont = Integer.valueOf(val); }
+            public String getDefault() { return res.getString(R.string.default_key_font); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_text_color", new StringPref() {
+            public void set(String val) { keyTextColor = Integer.valueOf(val); }
+            public String getDefault() { return res.getString(R.string.default_key_text_color); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addBooleanPref("pref_key_bold", new BooleanPref() {
+            public void set(boolean val) { keyBold = val; }
+            public boolean getDefault() { return false; }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_tracking", new StringPref() {
+            public void set(String val) {
+                try {
+                    keyTracking = Float.parseFloat(val);
+                } catch (RuntimeException e) {
+                    keyTracking = 0f;
+                }
+            }
+            public String getDefault() { return "0"; }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_effect", new StringPref() {
+            public void set(String val) { keyEffect = Integer.valueOf(val); }
+            public String getDefault() { return res.getString(R.string.default_key_effect); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_glyphs", new StringPref() {
+            public void set(String val) { keyGlyphs = Integer.valueOf(val); }
+            public String getDefault() { return res.getString(R.string.default_key_glyphs); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_sound_profile", new StringPref() {
+            public void set(String val) { keySoundProfile = Integer.valueOf(val); }
+            public String getDefault() { return res.getString(R.string.default_key_sound_profile); }
             public int getFlags() { return FLAG_PREF_NONE; }
         });
 

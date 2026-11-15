@@ -1,22 +1,31 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="org.pocketworkstation.pckeyboard">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
-    <uses-permission android:name="android.permission.WRITE_USER_DICTIONARY" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <uses-feature android:name="android.hardware.faketouch" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
-    <application android:label="@string/english_ime_name"
+    <application
+            android:label="@string/english_ime_name"
             android:allowBackup="true"
             android:backupAgent="LatinIMEBackupAgent"
+            android:dataExtractionRules="@xml/data_extraction_rules"
+            android:fullBackupContent="@xml/backup_rules"
             android:restoreAnyVersion="true"
-            android:hardwareAccelerated="false"
+            android:hardwareAccelerated="true"
             android:killAfterRestore="false"
-            android:icon="@drawable/icon">
+            android:enableOnBackInvokedCallback="true"
+            android:supportsRtl="true"
+            android:theme="@style/Theme.HackersKeyboard"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round">
+        <meta-data
+            android:name="android.app.shortcuts"
+            android:resource="@xml/shortcuts" />
 
         <service android:name="LatinIME"
+                android:exported="true"
                 android:label="@string/english_ime_name"
                 android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>
@@ -25,14 +34,21 @@
             <meta-data android:name="android.view.im" android:resource="@xml/method" />
         </service>
 
-        <activity android:name="Main" android:label="Hacker's Keyboard">
+        <activity android:name="Main"
+                android:exported="true"
+                android:label="@string/english_ime_name"
+                android:theme="@style/Theme.HackersKeyboard"
+                android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name="LatinIMESettings" android:label="@string/english_ime_settings">
+        <activity android:name="LatinIMESettings"
+                android:exported="true"
+                android:label="@string/english_ime_settings"
+                android:parentActivityName="org.pocketworkstation.pckeyboard.Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <action android:name="org.pocketworkstation.pckeyboard.SETTINGS"/>
@@ -41,39 +57,51 @@
         </activity>
 
         <activity android:name="InputLanguageSelection"
-                android:label="@string/language_selection_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <action android:name="org.pocketworkstation.pckeyboard.INPUT_LANGUAGE_SELECTION"/>
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+                android:exported="false"
+                android:label="@string/language_selection_title" />
 
         <activity android:name="PrefScreenActions"
-                android:label="@string/pref_screen_actions_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <action android:name="org.pocketworkstation.pckeyboard.PREFS_ACTIONS"/>
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-            
+                android:exported="false"
+                android:label="@string/pref_screen_actions_title" />
+
         <activity android:name="PrefScreenView"
-                android:label="@string/pref_screen_actions_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <action android:name="org.pocketworkstation.pckeyboard.PREFS_VIEW"/>
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+                android:exported="false"
+                android:label="@string/pref_screen_view_title" />
 
         <activity android:name="PrefScreenFeedback"
-                android:label="@string/pref_screen_feedback_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <action android:name="org.pocketworkstation.pckeyboard.PREFS_FEEDBACK"/>
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-</application>
+                android:exported="false"
+                android:label="@string/pref_screen_feedback_title" />
+
+        <activity android:name="SearchSettingsActivity"
+                android:exported="false"
+                android:label="@string/title_search_settings" 
+                android:windowSoftInputMode="adjustResize"/>
+
+        <activity android:name="BackgroundImageActivity"
+                android:exported="false"
+                android:label="@string/background_images_title" />
+
+        <activity android:name="PerAppThemeActivity"
+                android:exported="false"
+                android:label="@string/title_per_app_themes" />
+
+        <activity android:name="MacrosActivity"
+                android:exported="false"
+                android:label="@string/title_macros" 
+                android:windowSoftInputMode="adjustResize"/>
+
+        <activity android:name="SnippetsActivity"
+                android:exported="false"
+                android:label="@string/title_snippets" 
+                android:windowSoftInputMode="adjustResize"/>
+
+        <activity android:name="ClipboardHistoryActivity"
+                android:exported="false"
+                android:label="@string/title_clipboard_history" />
+
+        <activity android:name="KeyboardPreviewActivity"
+                android:exported="false"
+                android:label="@string/title_preview_keyboard"
+                android:windowSoftInputMode="stateVisible|adjustResize" />
+    </application>
 </manifest>

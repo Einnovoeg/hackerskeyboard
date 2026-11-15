@@ -16,84 +16,207 @@
 
 package org.pocketworkstation.pckeyboard;
 
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.view.View;
+import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.TextView.BufferType;
 
-public class Main extends Activity {
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
+
+import java.util.List;
+
+/**
+ * Modern Material 3 landing screen: shows the current keyboard status and the
+ * actions needed to enable and select the input method.
+ */
+public class Main extends AppCompatActivity {
 
     private final static String MARKET_URI = "market://search?q=pub:\"Klaus Weidner\"";
 
+    private TextView mStatusEnabled;
+    private TextView mStatusSelected;
+    private MaterialButton mEnableButton;
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        String html = getString(R.string.main_body);
-        html += "<p><i>Version: " + getString(R.string.auto_version) + "</i></p>";
-        Spanned content = Html.fromHtml(html);
-        TextView description = (TextView) findViewById(R.id.main_description);
-        description.setMovementMethod(LinkMovementMethod.getInstance());
-        description.setText(content, BufferType.SPANNABLE);
 
+        MaterialToolbar toolbar = findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
 
-        final Button setup1 = (Button) findViewById(R.id.main_setup_btn_configure_imes);
-        setup1.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                startActivityForResult(new Intent(android.provider.Settings.ACTION_INPUT_METHOD_SETTINGS), 0);
+        applyWindowInsets();
+        keepTestFieldVisible();
+
+        mStatusEnabled = findViewById(R.id.main_status_enabled);
+        mStatusSelected = findViewById(R.id.main_status_selected);
+        mEnableButton = findViewById(R.id.main_setup_btn_configure_imes);
+
+        mEnableButton.setOnClickListener(v -> {
+            try {
+                startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, R.string.main_no_settings_activity, Toast.LENGTH_LONG).show();
             }
         });
 
-        final Button setup2 = (Button) findViewById(R.id.main_setup_btn_set_ime);
-        setup2.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        MaterialButton selectButton = findViewById(R.id.main_setup_btn_set_ime);
+        selectButton.setOnClickListener(v -> {
+            InputMethodManager mgr =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (mgr != null) {
                 mgr.showInputMethodPicker();
             }
         });
-        
-        final Activity that = this;
 
-        final Button setup4 = (Button) findViewById(R.id.main_setup_btn_input_lang);
-        setup4.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                startActivityForResult(new Intent(that, InputLanguageSelection.class), 0);
+        MaterialButton langButton = findViewById(R.id.main_setup_btn_input_lang);
+        langButton.setOnClickListener(v ->
+                startActivity(new Intent(this, InputLanguageSelection.class)));
+
+        MaterialButton settingsButton = findViewById(R.id.main_setup_btn_settings);
+        settingsButton.setOnClickListener(v ->
+                startActivity(new Intent(this, LatinIMESettings.class)));
+
+        MaterialButton dictButton = findViewById(R.id.main_setup_btn_get_dicts);
+        dictButton.setOnClickListener(v -> {
+            Intent it = new Intent(Intent.ACTION_VIEW, Uri.parse(MARKET_URI));
+            try {
+                startActivity(it);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(getApplicationContext(),
+                        getResources().getString(R.string.no_market_warning),
+                        Toast.LENGTH_LONG).show();
             }
         });
 
-        final Button setup3 = (Button) findViewById(R.id.main_setup_btn_get_dicts);
-        setup3.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent it = new Intent(Intent.ACTION_VIEW, Uri.parse(MARKET_URI));
-                try {
-                	startActivity(it);
-                } catch (ActivityNotFoundException e) {
-                    Toast.makeText(getApplicationContext(),
-                            getResources().getString(
-                            		R.string.no_market_warning), Toast.LENGTH_LONG)
-                            .show();
-                }
-            }
-        });
-        // PluginManager.getPluginDictionaries(getApplicationContext()); // why?
+        TextView description = findViewById(R.id.main_description);
+        String html = getString(R.string.main_body);
+        Spanned content = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+        description.setMovementMethod(LinkMovementMethod.getInstance());
+        description.setText(content);
 
-        final Button setup5 = (Button) findViewById(R.id.main_setup_btn_settings);
-        setup5.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                startActivityForResult(new Intent(that, LatinIMESettings.class), 0);
+        TextView version = findViewById(R.id.main_version);
+        version.setText(getString(R.string.auto_version));
+    }
+
+    /** Scrolls the try-it-out field into view when the keyboard shrinks the window. */
+    private void keepTestFieldVisible() {
+        final android.view.View test = findViewById(R.id.main_setup_edit_test);
+        if (test == null) {
+            return;
+        }
+        test.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                v.postDelayed(this::scrollTestIntoView, 350);
             }
         });
-    }    
+    }
+
+    /** Brings the bottom of the try-it-out field above the keyboard, if it is covered. */
+    private void scrollTestIntoView() {
+        android.view.View test = findViewById(R.id.main_setup_edit_test);
+        androidx.core.widget.NestedScrollView scroll = findViewById(R.id.main_scroll);
+        if (test == null || scroll == null || !test.hasFocus()) {
+            return;
+        }
+        int[] field = new int[2];
+        int[] frame = new int[2];
+        test.getLocationOnScreen(field);
+        scroll.getLocationOnScreen(frame);
+        int covered = (field[1] + test.getHeight()) - (frame[1] + scroll.getHeight());
+        if (covered > 0) {
+            int margin = (int) (16 * getResources().getDisplayMetrics().density);
+            scroll.smoothScrollBy(0, covered + margin);
+        }
+    }
+
+    private void applyWindowInsets() {
+        final android.view.View appBar = (android.view.View)
+                findViewById(R.id.main_toolbar).getParent();
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_root), (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            // Edge-to-edge windows are not resized for the keyboard, so the bottom
+            // inset has to follow it or the test field ends up behind the keys.
+            int bottom = Math.max(bars.bottom, ime.bottom);
+            v.setPadding(bars.left, 0, bars.right, bottom);
+            // Inset the app bar instead of the root: content then stays below the clock
+            // even while the page scrolls.
+            if (appBar != null) {
+                appBar.setPadding(0, bars.top, 0, 0);
+            }
+            // Cover the status bar strip: scrolled page content would otherwise show
+            // through it, which reads as text sitting inside the clock.
+            android.view.View scrim = findViewById(R.id.main_status_scrim);
+            if (scrim != null && scrim.getLayoutParams().height != bars.top) {
+                scrim.getLayoutParams().height = bars.top;
+                scrim.requestLayout();
+            }
+            if (insets.isVisible(WindowInsetsCompat.Type.ime())) {
+                v.postDelayed(this::scrollTestIntoView, 120);
+            }
+            return insets;
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateStatus();
+    }
+
+    private void updateStatus() {
+        boolean enabled = isImeEnabled();
+        boolean selected = isImeSelected();
+
+        mStatusEnabled.setText(enabled ? R.string.main_status_enabled : R.string.main_status_disabled);
+        mStatusEnabled.setTextColor(getColor(enabled
+                ? R.color.hk_status_ok : R.color.hk_status_pending));
+
+        mStatusSelected.setText(selected
+                ? R.string.main_status_selected : R.string.main_status_not_selected);
+        mStatusSelected.setTextColor(getColor(selected
+                ? R.color.hk_status_ok : R.color.hk_status_pending));
+
+        mEnableButton.setText(enabled
+                ? R.string.main_setup_configure_imes : R.string.main_setup_enable_ime);
+    }
+
+    private boolean isImeEnabled() {
+        InputMethodManager imm =
+                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) return false;
+        List<InputMethodInfo> methods = imm.getEnabledInputMethodList();
+        if (methods == null) return false;
+        String pkg = getPackageName();
+        for (InputMethodInfo info : methods) {
+            if (pkg.equals(info.getPackageName())) return true;
+        }
+        return false;
+    }
+
+    private boolean isImeSelected() {
+        String current = Settings.Secure.getString(
+                getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
+        return current != null && current.startsWith(getPackageName() + "/");
+    }
 }
-

@@ -1,27 +1,23 @@
 package org.pocketworkstation.pckeyboard;
 
 import android.content.Context;
-import android.preference.EditTextPreference;
 import android.util.AttributeSet;
 
-public class AutoSummaryEditTextPreference extends EditTextPreference {
+import androidx.preference.EditTextPreference;
 
-    public AutoSummaryEditTextPreference(Context context) {
-        super(context);
-    }
+public class AutoSummaryEditTextPreference extends EditTextPreference {
 
     public AutoSummaryEditTextPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public AutoSummaryEditTextPreference(Context context, AttributeSet attrs,
-            int defStyle) {
+    public AutoSummaryEditTextPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
     @Override
-    public void setText(String text) {
-        super.setText(text);
-        setSummary(text);
+    public CharSequence getSummary() {
+        CharSequence text = getText();
+        return text == null ? super.getSummary() : text;
     }
 }

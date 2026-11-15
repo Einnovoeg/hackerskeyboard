@@ -61,7 +61,7 @@ public class KeyboardSwitcher implements
 
     public static final String DEFAULT_LAYOUT_ID = "0";
     public static final String PREF_KEYBOARD_LAYOUT = "pref_keyboard_layout";
-    private static final int[] THEMES = new int[] {
+    static final int[] THEMES = new int[] {
         R.layout.input_ics,
         R.layout.input_gingerbread,
         R.layout.input_stone_bold,
@@ -70,6 +70,28 @@ public class KeyboardSwitcher implements
         R.layout.input_material_light,
         R.layout.input_ics_darker,
         R.layout.input_material_black,
+        R.layout.input_modern_dark,
+        R.layout.input_modern_light,
+        R.layout.input_modern_clear,
+        R.layout.input_modern_oled,
+        R.layout.input_wood,
+        R.layout.input_ocean,
+        R.layout.input_forest,
+        R.layout.input_sunset,
+        R.layout.input_nebula,
+        R.layout.input_rose,
+        R.layout.input_sandstone,
+        R.layout.input_midnight,
+        R.layout.input_aurora,
+        R.layout.input_cyberpunk,
+        R.layout.input_paper,
+        R.layout.input_carbon,
+        R.layout.input_lagoon,
+        R.layout.input_ember,
+        R.layout.input_cobalt,
+        R.layout.input_blossom,
+        R.layout.input_glacier,
+        R.layout.input_obsidian,
     };
 
     // Tables which contains resource ids for each character theme color
@@ -79,6 +101,8 @@ public class KeyboardSwitcher implements
     private static final int KBD_SYMBOLS_SHIFT = R.xml.kbd_symbols_shift;
     private static final int KBD_QWERTY = R.xml.kbd_qwerty;
     private static final int KBD_FULL = R.xml.kbd_full;
+    private static final int KBD_FULL_AZERTY = R.xml.kbd_full_azerty;
+    private static final int KBD_FULL_DVORAK = R.xml.kbd_full_dvorak;
     private static final int KBD_FULL_FN = R.xml.kbd_full_fn;
     private static final int KBD_COMPACT = R.xml.kbd_compact;
     private static final int KBD_COMPACT_FN = R.xml.kbd_compact_fn;
@@ -153,6 +177,13 @@ public class KeyboardSwitcher implements
 
         final SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(ims);
+        if (!prefs.contains(PREF_KEYBOARD_LAYOUT)) {
+            // First run: pick the modern theme that matches the system dark mode setting.
+            boolean night = (ims.getResources().getConfiguration().uiMode
+                    & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                    == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+            prefs.edit().putString(PREF_KEYBOARD_LAYOUT, night ? "8" : "9").apply();
+        }
         sInstance.mLayoutId = Integer.valueOf(prefs.getString(
                 PREF_KEYBOARD_LAYOUT, DEFAULT_LAYOUT_ID));
 
@@ -357,6 +388,21 @@ public class KeyboardSwitcher implements
         return mFullMode > 0;
     }
 
+    /**
+     * The 5-row letter layout chosen in the settings. The live keyboard, the Fn
+     * keyboard and the settings preview all come through here so they cannot drift.
+     */
+    static int fullLayoutXml() {
+        switch (LatinIME.sKeyboardSettings.keyboardLayout) {
+        case 1:
+            return KBD_FULL_AZERTY;
+        case 2:
+            return KBD_FULL_DVORAK;
+        default:
+            return KBD_FULL;
+        }
+    }
+
     private KeyboardId getKeyboardId(int mode, int imeOptions, boolean isSymbols) {
         boolean hasVoice = hasVoiceButton(isSymbols);
         if (mFullMode > 0) {
@@ -366,7 +412,7 @@ public class KeyboardSwitcher implements
             case MODE_EMAIL:
             case MODE_IM:
             case MODE_WEB:
-                return new KeyboardId(mFullMode == 1 ? KBD_COMPACT : KBD_FULL,
+                return new KeyboardId(mFullMode == 1 ? KBD_COMPACT : fullLayoutXml(),
                         KEYBOARDMODE_NORMAL, true, hasVoice);
             }
         }
@@ -607,6 +653,15 @@ public class KeyboardSwitcher implements
         return mInputView;
     }
 
+    public int getLayoutId() {
+        return mLayoutId;
+    }
+
+    /** Switches to a specific theme index (used by per-app rules). */
+    public void setLayout(int layoutId) {
+        changeLatinKeyboardView(layoutId, true);
+    }
+
     public void recreateInputView() {
         changeLatinKeyboardView(mLayoutId, true);
     }
@@ -636,9 +691,29 @@ public class KeyboardSwitcher implements
                             mLayoutId + "," + newLayout, e);
                 }
             }
+            if (mInputView == null) {
+                // Never leave the switcher without a view: fall back to the default theme.
+                newLayout = Integer.valueOf(DEFAULT_LAYOUT_ID);
+                mInputView = (LatinKeyboardView) mInputMethodService.getLayoutInflater()
+                        .inflate(THEMES[newLayout], null);
+            }
             mInputView.setExtensionLayoutResId(THEMES[newLayout]);
+            if (LatinIME.sKeyboardSettings != null) {
+                LatinIME.sKeyboardSettings.keyboardTheme = newLayout;
+            }
             mInputView.setOnKeyboardActionListener(mInputMethodService);
-            mInputView.setPadding(0, 0, 0, 0);
+            // Keep the bottom key row clear of the system gesture handle.
+            int navInset = 0;
+            if (android.os.Build.VERSION.SDK_INT >= 30) {
+                android.view.WindowManager wm = mInputMethodService.getSystemService(
+                        android.view.WindowManager.class);
+                if (wm != null) {
+                    navInset = wm.getCurrentWindowMetrics().getWindowInsets()
+                            .getInsetsIgnoringVisibility(
+                                    android.view.WindowInsets.Type.navigationBars()).bottom;
+                }
+            }
+            mInputView.setPadding(0, 0, 0, navInset);
             mLayoutId = newLayout;
         }
         mInputMethodService.mHandler.post(new Runnable() {

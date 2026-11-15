@@ -27,13 +27,20 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Paint.Align;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.LinearGradient;
+import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.Region.Op;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.StateListDrawable;
 
 import org.pocketworkstation.pckeyboard.Keyboard.Key;
@@ -57,6 +64,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -183,11 +191,117 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     private boolean mInvertSymbols;
     private boolean mRecolorSymbols;
     private Typeface mKeyTextStyle = Typeface.DEFAULT;
+
+    /** Label typefaces offered by the "Key font" setting; index 0 keeps the theme default. */
+    private static final Typeface[] LABEL_TYPEFACES = new Typeface[] {
+            Typeface.DEFAULT,
+            Typeface.create("sans-serif", Typeface.NORMAL),
+            Typeface.create("sans-serif-condensed", Typeface.NORMAL),
+            Typeface.create("sans-serif-light", Typeface.NORMAL),
+            Typeface.create("sans-serif-medium", Typeface.NORMAL),
+            Typeface.create("sans-serif-black", Typeface.NORMAL),
+            Typeface.create("monospace", Typeface.NORMAL),
+            Typeface.create("serif", Typeface.NORMAL),
+            Typeface.create("casual", Typeface.NORMAL),
+            Typeface.create("cursive", Typeface.NORMAL),
+    };
+
+    private Typeface mLabelTypefaceHint = Typeface.DEFAULT_BOLD;
+
+    /** Colours offered by the "Key letter colour" setting; index 0 means the theme colour. */
+    private static final int[] KEY_TEXT_COLORS = new int[] {
+            0, 0xFFFFFFFF, 0xFF000000, 0xFF9AA0A6, 0xFFFFC107, 0xFFFF9F0A,
+            0xFFFFEB3B, 0xFFC6FF00, 0xFF34C759, 0xFF00BFA5, 0xFF32ADE6,
+            0xFF0A84FF, 0xFF5E5CE6, 0xFFBF5AF2, 0xFFFF6FA5, 0xFFFF453A,
+    };
+
+    /** Animated background effects, see key_effect_values in strings.xml. */
+    public static final int EFFECT_NONE = 0;
+    public static final int EFFECT_MATRIX = 1;
+    public static final int EFFECT_STARS = 2;
+    public static final int EFFECT_AURORA = 3;
+    public static final int EFFECT_SCANLINES = 4;
+    public static final int EFFECT_RAIN = 5;
+    public static final int EFFECT_BUBBLES = 6;
+    public static final int EFFECT_GRID = 7;
+    public static final int EFFECT_FIREFLIES = 8;
+    public static final int EFFECT_PLASMA = 9;
+    public static final int EFFECT_SNOW = 10;
+    public static final int EFFECT_VORTEX = 11;
+    public static final int EFFECT_RIPPLES = 12;
+    public static final int EFFECT_BEAMS = 13;
+    public static final int EFFECT_FLOW = 14;
+    public static final int EFFECT_CONSTELLATION = 15;
+
+    private static final char[] MATRIX_ALPHABET =
+            "01010101ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ<>[]{}/\\=+*#$%&@".toCharArray();
+
+    private final Paint mMatrixPaint = new Paint();
+    private float[] mMatrixHead;
+    private float[] mMatrixSpeed;
+    private char[] mMatrixGlyph;
+    private long mMatrixLastFrame;
+    private int mMatrixColumns;
+
+    private float[] mStarX;
+    private float[] mStarY;
+    private float[] mStarSpeed;
+    private long mEffectClock;
+    private final Paint mEffectPaint = new Paint();
+
+    private int mKeyBorderColor = 0;
+    private final Paint mKeyBorderPaint = new Paint();
+    private final Paint mKeyShadowPaint = new Paint();
+    private final Paint mKeyBevelPaint = new Paint();
+    private final Paint mKeyGlossPaint = new Paint();
+    private Shader mKeyGlossShader;
+    private int mKeyGlossHeight = -1;
+    private final RectF mKeyRect = new RectF();
+    private float mKeyCornerRadius;
+    private float mKeyShadowDy;
+    private float mShadowScale = 1f;
+    private float mKeyOpacity = 1f;
+
+    /** Key cap solidity, 0.4-1.0; background art shows through lower values. */
+    public void applyKeyOpacity(float opacity) {
+        mKeyOpacity = Math.max(0.4f, Math.min(1f, opacity));
+        updateKeyCapAlpha();
+        invalidate();
+    }
+
+    /** Drop-shadow depth multiplier, 0 flattens the caps. */
+    public void applyKeyShadow(float scale) {
+        mShadowScale = Math.max(0f, Math.min(2f, scale));
+        mKeyShadowDy = 2 * getResources().getDisplayMetrics().density * mShadowScale;
+        invalidate();
+    }
+
+    private void updateKeyCapAlpha() {
+        if (mKeyBackground == null) return;
+        int base = mBackgroundImage != null ? 205 : 255;
+        mKeyBackground.setAlpha(Math.round(base * mKeyOpacity));
+    }
     private float mLabelTextSize;
     private int mSymbolColorScheme = 0;
     private int mShadowColor;
     private float mShadowRadius;
     private Drawable mKeyBackground;
+    private float mHeightScale = 1f;
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        sLastInstance = this;
+    }
+    private int mKeyRadiusPx = -1;
+    private float mBackgroundDim = 0f;
+    private Drawable mBackgroundImage;
+    private int mBackgroundIndex = -1;
+    private float mPinchStartSpan = 0f;
+    private float mPinchStartScale = 1f;
+    private boolean mPinching = false;
+    private Drawable mThemeBackground;
+    private boolean mThemeBackgroundCaptured;
     private int mBackgroundAlpha;
     private float mBackgroundDimAmount;
     private float mKeyHysteresisDistance;
@@ -198,6 +312,8 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
 
     // Main keyboard
     private Keyboard mKeyboard;
+    /** Static rendering for the settings preview: no animation loop, no touch. */
+    private boolean mPreviewMode;
     private Key[] mKeys;
     // TODO this attribute should be gotten from Keyboard.
     private int mKeyboardVerticalGap;
@@ -487,68 +603,50 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         for (int i = 0; i < n; i++) {
             int attr = a.getIndex(i);
 
-            switch (attr) {
-            case R.styleable.LatinKeyboardBaseView_keyBackground:
+            // Resource ids are not compile-time constants with modern Android Gradle
+            // Plugin versions, so this is an if/else chain instead of a switch.
+            if (attr == R.styleable.LatinKeyboardBaseView_keyBackground) {
                 mKeyBackground = a.getDrawable(attr);
-                break;
-            case R.styleable.LatinKeyboardBaseView_keyHysteresisDistance:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_keyHysteresisDistance) {
                 mKeyHysteresisDistance = a.getDimensionPixelOffset(attr, 0);
-                break;
-            case R.styleable.LatinKeyboardBaseView_verticalCorrection:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_verticalCorrection) {
                 mVerticalCorrection = a.getDimensionPixelOffset(attr, 0);
-                break;
-            case R.styleable.LatinKeyboardBaseView_keyTextSize:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_keyTextSize) {
                 mKeyTextSize = a.getDimensionPixelSize(attr, 18);
-                break;
-            case R.styleable.LatinKeyboardBaseView_keyTextColor:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_keyTextColor) {
                 mKeyTextColor = a.getColor(attr, 0xFF000000);
-                break;
-            case R.styleable.LatinKeyboardBaseView_keyHintColor:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_keyHintColor) {
                 mKeyHintColor = a.getColor(attr, 0xFFBBBBBB);
-                break;
-            case R.styleable.LatinKeyboardBaseView_keyCursorColor:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_keyCursorColor) {
                 mKeyCursorColor = a.getColor(attr, 0xFF000000);
-                break;
-            case R.styleable.LatinKeyboardBaseView_invertSymbols:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_invertSymbols) {
                 mInvertSymbols = a.getBoolean(attr, false);
-                break;
-            case R.styleable.LatinKeyboardBaseView_recolorSymbols:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_recolorSymbols) {
                 mRecolorSymbols = a.getBoolean(attr, false);
-                break;
-            case R.styleable.LatinKeyboardBaseView_labelTextSize:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_labelTextSize) {
                 mLabelTextSize = a.getDimensionPixelSize(attr, 14);
-                break;
-            case R.styleable.LatinKeyboardBaseView_shadowColor:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_shadowColor) {
                 mShadowColor = a.getColor(attr, 0);
-                break;
-            case R.styleable.LatinKeyboardBaseView_shadowRadius:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_shadowRadius) {
                 mShadowRadius = a.getFloat(attr, 0f);
-                break;
-            // TODO: Use Theme (android.R.styleable.Theme_backgroundDimAmount)
-            case R.styleable.LatinKeyboardBaseView_backgroundDimAmount:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_backgroundDimAmount) {
+                // TODO: Use Theme (android.R.styleable.Theme_backgroundDimAmount)
                 mBackgroundDimAmount = a.getFloat(attr, 0.5f);
-                break;
-            case R.styleable.LatinKeyboardBaseView_backgroundAlpha:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_backgroundAlpha) {
                 mBackgroundAlpha = a.getInteger(attr, 255);
-                break;
-            //case android.R.styleable.
-            case R.styleable.LatinKeyboardBaseView_keyTextStyle:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_keyTextStyle) {
                 int textStyle = a.getInt(attr, 0);
-                switch (textStyle) {
-                    case 0:
-                        mKeyTextStyle = Typeface.DEFAULT;
-                        break;
-                    case 1:
-                        mKeyTextStyle = Typeface.DEFAULT_BOLD;
-                        break;
-                    default:
-                        mKeyTextStyle = Typeface.defaultFromStyle(textStyle);
-                        break;
+                if (textStyle == 0) {
+                    mKeyTextStyle = Typeface.DEFAULT;
+                } else if (textStyle == 1) {
+                    mKeyTextStyle = Typeface.DEFAULT_BOLD;
+                } else {
+                    mKeyTextStyle = Typeface.defaultFromStyle(textStyle);
                 }
-                break;
-            case R.styleable.LatinKeyboardBaseView_symbolColorScheme:
+            } else if (attr == R.styleable.LatinKeyboardBaseView_keyBorderColor) {
+                mKeyBorderColor = a.getColor(attr, 0);
+            } else if (attr == R.styleable.LatinKeyboardBaseView_symbolColorScheme) {
                 mSymbolColorScheme = a.getInt(attr, 0);
-                break;
             }
         }
 
@@ -571,9 +669,28 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         mPaintHint.setTextAlign(Align.RIGHT);
         mPaintHint.setAlpha(255);
         mPaintHint.setTypeface(Typeface.DEFAULT_BOLD);
+        mLabelTypefaceHint = Typeface.DEFAULT_BOLD;
 
         mPadding = new Rect(0, 0, 0, 0);
         mKeyBackground.getPadding(mPadding);
+
+        final float density = res.getDisplayMetrics().density;
+        mKeyCornerRadius = 6 * density;
+        mKeyShadowDy = 2 * density;
+        mKeyBorderPaint.setStyle(Paint.Style.STROKE);
+        mKeyBorderPaint.setAntiAlias(true);
+        mKeyBorderPaint.setStrokeWidth(Math.max(1f, density));
+        mKeyShadowPaint.setStyle(Paint.Style.FILL);
+        mKeyShadowPaint.setAntiAlias(true);
+        mKeyShadowPaint.setColor(0x42000000);
+        mKeyBevelPaint.setStyle(Paint.Style.STROKE);
+        mKeyBevelPaint.setAntiAlias(true);
+        mKeyBevelPaint.setStrokeWidth(Math.max(1f, density));
+        mKeyGlossPaint.setStyle(Paint.Style.FILL);
+        mKeyGlossPaint.setAntiAlias(true);
+        mMatrixPaint.setAntiAlias(true);
+        mMatrixPaint.setTypeface(Typeface.MONOSPACE);
+        mMatrixPaint.setTextAlign(Paint.Align.CENTER);
 
         mSwipeThreshold = (int) (300 * res.getDisplayMetrics().density);
         // TODO: Refer frameworks/base/core/res/res/values/config.xml
@@ -660,6 +777,11 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
      * @see #getKeyboard()
      * @param keyboard the keyboard to display in this view
      */
+    public void setPreviewMode(boolean preview) {
+        mPreviewMode = preview;
+        invalidateAllKeys();
+    }
+
     public void setKeyboard(Keyboard keyboard) {
         if (mKeyboard != null) {
             dismissKeyPreview();
@@ -817,6 +939,142 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         return mKeyDetector.isProximityCorrectionEnabled();
     }
 
+    /** Applies user tuning (height, key radius, background dim) to the live keyboard. */
+    public void applyCustomization(float heightScale, float radiusDp, float dim) {
+        mHeightScale = Math.max(0.6f, Math.min(1.6f, heightScale));
+        mBackgroundDim = Math.max(0f, Math.min(0.85f, dim));
+        mKeyShadowDy = 2 * getResources().getDisplayMetrics().density * mShadowScale;
+        setPivotY(getHeight());
+        setScaleY(mHeightScale);
+        int radiusPx = Math.round(radiusDp * getResources().getDisplayMetrics().density);
+        if (radiusPx != mKeyRadiusPx) {
+            mKeyRadiusPx = radiusPx;
+            applyKeyRadius(mKeyBackground, radiusPx);
+        }
+        invalidate();
+    }
+
+    /**
+     * Paints the chosen art as the view background (the framework always draws it,
+     * behind keys and before effects) and makes the key caps translucent so the art
+     * reads through the gaps and through the caps themselves.
+     */
+    private void syncBackgroundImage() {
+        if (!mThemeBackgroundCaptured) {
+            mThemeBackground = getBackground();
+            mThemeBackgroundCaptured = true;
+        }
+        int index = BackgroundImages.selected(getContext());
+        if (index == mBackgroundIndex) return;
+        mBackgroundIndex = index;
+        int res = BackgroundImages.drawableFor(index);
+        if (res == 0) {
+            mBackgroundImage = null;
+            if (mThemeBackground != null) setBackground(mThemeBackground);
+            updateKeyCapAlpha();
+        } else {
+            mBackgroundImage = getContext().getResources().getDrawable(res, getContext().getTheme());
+            setBackground(mBackgroundImage);
+            updateKeyCapAlpha();
+        }
+        invalidate();
+    }
+
+    /** Sets the bundled art drawn under the animation effect; null clears it. */
+    public void applyBackgroundImage(Drawable drawable) {
+        mBackgroundImage = drawable;
+        if (drawable != null) {
+            drawable.setBounds(0, 0, getWidth(), getHeight());
+        }
+        invalidate();
+    }
+
+    /** Fills the canvas only when no image is behind the effect. */
+    private void fillBase(Canvas canvas, int color) {
+        if (mBackgroundImage == null) {
+            canvas.drawColor(color);
+        }
+    }
+
+    private void applyKeyRadius(Drawable drawable, int radiusPx) {
+        if (drawable == null) return;
+        if (drawable instanceof GradientDrawable) {
+            ((GradientDrawable) drawable).setCornerRadius(radiusPx);
+        } else if (drawable instanceof StateListDrawable) {
+            StateListDrawable states = (StateListDrawable) drawable;
+            for (int i = 0; i < states.getStateCount(); i++) {
+                applyKeyRadius(states.getStateDrawable(i), radiusPx);
+            }
+        } else if (drawable instanceof LayerDrawable) {
+            LayerDrawable layers = (LayerDrawable) drawable;
+            for (int i = 0; i < layers.getNumberOfLayers(); i++) {
+                applyKeyRadius(layers.getDrawable(i), radiusPx);
+            }
+        }
+    }
+
+    /** Applies a pinch height scale and remembers it for the next input view. */
+    public void applyPinchScale(float scale) {
+        mHeightScale = Math.max(0.7f, Math.min(1.5f, scale));
+        setPivotY(getHeight());
+        setScaleY(mHeightScale);
+        persistHeightScale();
+    }
+
+    private void persistHeightScale() {
+        getContext().getSharedPreferences(
+                getContext().getPackageName() + "_preferences",
+                android.content.Context.MODE_PRIVATE)
+                .edit()
+                .putString("pref_key_height_scale",
+                        String.format(java.util.Locale.US, "%.2f", mHeightScale))
+                .apply();
+    }
+
+    /** Most recently created keyboard view; used by the debug pinch trigger. */
+    public static LatinKeyboardBaseView lastInstance() {
+        return sLastInstance;
+    }
+
+    private static LatinKeyboardBaseView sLastInstance;
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        // The settings preview is a picture, never an input surface.
+        if (mPreviewMode) return false;
+        switch (ev.getActionMasked()) {
+            case MotionEvent.ACTION_POINTER_DOWN:
+                if (ev.getPointerCount() >= 2) {
+                    mPinchStartSpan = Math.abs(ev.getY(0) - ev.getY(1));
+                    mPinchStartScale = mHeightScale;
+                    mPinching = mPinchStartSpan > 1;
+                    if (mPinching) return true;
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (mPinching && ev.getPointerCount() >= 2) {
+                    float span = Math.abs(ev.getY(0) - ev.getY(1));
+                    float scale = Math.max(0.7f, Math.min(1.5f,
+                            mPinchStartScale * (span / Math.max(1f, mPinchStartSpan))));
+                    applyPinchScale(scale);
+                    return true;
+                }
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                if (mPinching) {
+                    mPinching = false;
+                    persistHeightScale();
+                    return true;
+                }
+                break;
+            default:
+                break;
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // Round up a little
@@ -830,8 +1088,13 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
                 if (badWidth != width) Log.i(TAG, "ignoring unexpected width=" + badWidth);
             }
             Log.i(TAG, "onMeasure width=" + width);
-            setMeasuredDimension(
-                    width, mKeyboard.getHeight() + getPaddingTop() + getPaddingBottom());
+            int baseHeight = mKeyboard.getHeight() + getPaddingTop() + getPaddingBottom();
+            if (mHeightScale != 1f) {
+                // Ask the IME window for the scaled height so a pinch never clips keys.
+                heightMeasureSpec = MeasureSpec.makeMeasureSpec(
+                        Math.round(baseHeight * mHeightScale), MeasureSpec.EXACTLY);
+            }
+            setMeasuredDimension(width, Math.round(baseHeight * mHeightScale));
         }
     }
 
@@ -852,7 +1115,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
             dimensionSum += Math.min(key.width, key.height + mKeyboardVerticalGap) + key.gap;
         }
         if (dimensionSum < 0 || length == 0) return;
-        mKeyDetector.setProximityThreshold((int) (dimensionSum * 1.4f / length));
+        mKeyDetector.setProximityThreshold((int) (dimensionSum * 1.55f / length));
     }
 
     @Override
@@ -917,9 +1180,28 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
 
         if (mKeyboard == null) return;
 
+        if (isWoodTheme()) {
+            drawWoodGrain(canvas, 0, 0, getWidth(), getHeight(), 64);
+        }
+        syncBackgroundImage();
+        if (isEffectEnabled()) {
+            drawBackgroundEffect(canvas);
+        }
+        if (mBackgroundDim > 0.01f) {
+            mEffectPaint.setStyle(Paint.Style.FILL);
+            mEffectPaint.setShader(null);
+            mEffectPaint.setColor(((int) (mBackgroundDim * 255)) << 24);
+            canvas.drawRect(0, 0, getWidth(), getHeight(), mEffectPaint);
+        }
+
         final Paint paint = mPaint;
         final Paint paintHint = mPaintHint;
+        final int keyTextColor = getKeyTextColor();
         paintHint.setColor(mKeyHintColor);
+        mLabelTypefaceHint = LatinIME.sKeyboardSettings == null || LatinIME.sKeyboardSettings.keyFont <= 0
+                ? Typeface.DEFAULT_BOLD
+                : getLabelTypeface(false);
+        paintHint.setTypeface(mLabelTypefaceHint);
         final Drawable keyBackground = mKeyBackground;
         final Rect clipRegion = mClipRegion;
         final Rect padding = mPadding;
@@ -935,7 +1217,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         } else if (mRecolorSymbols) {
             // TODO: cache these?
             iconColorFilter = new PorterDuffColorFilter(
-                    mKeyTextColor, PorterDuff.Mode.SRC_ATOP);
+                    keyTextColor, PorterDuff.Mode.SRC_ATOP);
             shadowColorFilter = new PorterDuffColorFilter(
                     mShadowColor, PorterDuff.Mode.SRC_ATOP);
         }
@@ -951,7 +1233,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
                 drawSingleKey = true;
             }
         }
-        //canvas.drawColor(0x00000000, PorterDuff.Mode.CLEAR);
+        //fillBase(canvas, 0x00000000, PorterDuff.Mode.CLEAR);
         final int keyCount = keys.length;
 
         // Scale the key labels based on the median key size.
@@ -984,13 +1266,13 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
                 continue;
             }
             keysDrawn++;
-            paint.setColor(key.isCursor ? mKeyCursorColor : mKeyTextColor);
+            paint.setColor(key.isCursor ? mKeyCursorColor : keyTextColor);
 
             int[] drawableState = key.getCurrentDrawableState();
             keyBackground.setState(drawableState);
 
             // Switch the character to uppercase if shift is pressed
-            String label = key.getCaseLabel();
+            String label = applyGlyphStyle(key.getCaseLabel(), key.codes);
 
             float yscale = 1.0f;
             final Rect bounds = keyBackground.getBounds();
@@ -1010,23 +1292,87 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
             }
             if (mBackgroundAlpha != 255) {
                 keyBackground.setAlpha(mBackgroundAlpha);
+            } else if (isEffectEnabled()) {
+                // Let the effect show faintly through the caps.
+                keyBackground.setAlpha(205);
+            }
+
+            final int keyStyle = LatinIME.sKeyboardSettings.keyStyle;
+            final boolean drawableKey = key.codes.length > 0 || key.icon != null || key.label != null;
+            if (drawableKey && keyStyle == LatinIME.KEY_STYLE_RAISED) {
+                // Cast a soft shadow below the cap so the keys read as raised. This is
+                // barely visible on dark themes, which is what the bevel below is for.
+                mKeyRect.set(1, mKeyShadowDy + 1, key.width - 1, key.height + mKeyShadowDy);
+                canvas.drawRoundRect(mKeyRect, mKeyCornerRadius, mKeyCornerRadius, mKeyShadowPaint);
             }
             keyBackground.draw(canvas);
+            if (drawableKey && isWoodTheme()) {
+                canvas.save();
+                canvas.clipRect(0, 0, key.width, key.height);
+                drawWoodGrain(canvas, 0, 0, key.width, key.height, 40);
+                canvas.restore();
+            }
+            if (drawableKey && keyStyle != LatinIME.KEY_STYLE_FLAT && mKeyBorderColor != 0) {
+                final float inset = mKeyBorderPaint.getStrokeWidth() / 2f;
+                mKeyRect.set(inset, inset, key.width - inset, key.height - inset);
+                mKeyBorderPaint.setColor(mKeyBorderColor);
+                canvas.drawRoundRect(mKeyRect, mKeyCornerRadius, mKeyCornerRadius, mKeyBorderPaint);
+
+                if (keyStyle == LatinIME.KEY_STYLE_RAISED) {
+                    // Bevel: light along the top edge, shaded along the bottom one, so
+                    // the cap looks like a physical key on dark and light themes alike.
+                    final int pad = Math.round(inset + 2 * getResources().getDisplayMetrics().density);
+                    final int right = key.width - pad;
+                    if (right > pad) {
+                        mKeyBevelPaint.setColor(0x66FFFFFF);
+                        canvas.drawLine(pad, inset + 1, right, inset + 1, mKeyBevelPaint);
+                        mKeyBevelPaint.setColor(0x66000000);
+                        canvas.drawLine(pad, key.height - inset - 1, right, key.height - inset - 1,
+                                mKeyBevelPaint);
+                    }
+
+                    // Light falling on the top of the cap: bright at the top edge,
+                    // fading out before the middle of the key.
+                    if (mKeyGlossShader == null || mKeyGlossHeight != key.height) {
+                        mKeyGlossShader = new LinearGradient(0, 0, 0, key.height * 0.6f,
+                                0x2EFFFFFF, 0x00FFFFFF, Shader.TileMode.CLAMP);
+                        mKeyGlossHeight = key.height;
+                    }
+                    mKeyGlossPaint.setShader(mKeyGlossShader);
+                    canvas.drawRoundRect(mKeyRect, mKeyCornerRadius, mKeyCornerRadius, mKeyGlossPaint);
+                    mKeyGlossPaint.setShader(null);
+                }
+            }
             if (yscale != 1.0f)  canvas.restore();
 
             boolean shouldDrawIcon = true;
             if (label != null) {
                 // For characters, use large font. For labels like "Done", use small font.
-                final int labelSize;
-                if (label.length() > 1 && key.codes.length < 2) {
+                int labelSize;
+                final boolean wordLabel = label.length() > 1 && key.codes.length < 2;
+                if (wordLabel) {
                     //Log.i(TAG, "mLabelTextSize=" + mLabelTextSize + " LatinIME.sKeyboardSettings.labelScale=" + LatinIME.sKeyboardSettings.labelScale);
                     labelSize = (int)(mLabelTextSize * mLabelScale);
-                    paint.setTypeface(Typeface.DEFAULT);
                 } else {
                     labelSize = (int)(mKeyTextSize * mLabelScale);
-                    paint.setTypeface(mKeyTextStyle);
                 }
-                paint.setFakeBoldText(key.isCursor);
+                paint.setTypeface(getLabelTypeface(wordLabel));
+
+                // Keep the label inside its key no matter what scale or font is chosen.
+                final int maxByHeight = (int) (key.height * 0.62f);
+                final int maxByWidth = label.length() > 1
+                        ? (int) (key.width * 1.55f / label.length())
+                        : (int) (key.width * 0.85f);
+                labelSize = Math.max(8, Math.min(labelSize, Math.min(maxByHeight, maxByWidth)));
+                final boolean boldKeys = LatinIME.sKeyboardSettings != null
+                        && LatinIME.sKeyboardSettings.keyBold;
+                paint.setFakeBoldText(key.isCursor || boldKeys);
+                if (android.os.Build.VERSION.SDK_INT >= 21) {
+                    // Tracking applies to single-character keys only; word labels keep their fit.
+                    float tracking = LatinIME.sKeyboardSettings == null ? 0f
+                            : Math.max(0f, Math.min(0.2f, LatinIME.sKeyboardSettings.keyTracking));
+                    paint.setLetterSpacing(label.length() == 1 ? tracking : 0f);
+                }
                 paint.setTextSize(labelSize);
 
                 final int labelHeight = getLabelHeight(paint, labelSize);
@@ -1316,6 +1662,702 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         //onBufferDraw();
         invalidate(key.x + getPaddingLeft(), key.y + getPaddingTop(),
                 key.x + key.width + getPaddingLeft(), key.y + key.height + getPaddingTop());
+    }
+
+    private boolean isEffectEnabled() {
+        return LatinIME.sKeyboardSettings != null
+                && LatinIME.sKeyboardSettings.keyEffect != EFFECT_NONE;
+    }
+
+    /** Draws the selected animated background and schedules the next frame. */
+    private void drawBackgroundEffect(Canvas canvas) {
+        switch (LatinIME.sKeyboardSettings.keyEffect) {
+            case EFFECT_MATRIX:
+                drawMatrixEffect(canvas);
+                break;
+            case EFFECT_STARS:
+                drawStarfield(canvas);
+                break;
+            case EFFECT_AURORA:
+                drawAurora(canvas);
+                break;
+            case EFFECT_SCANLINES:
+                drawScanlines(canvas);
+                break;
+            case EFFECT_RAIN:
+                drawRainEffect(canvas);
+                break;
+            case EFFECT_BUBBLES:
+                drawBubblesEffect(canvas);
+                break;
+            case EFFECT_GRID:
+                drawNeonGrid(canvas);
+                break;
+            case EFFECT_FIREFLIES:
+                drawFireflies(canvas);
+                break;
+            case EFFECT_PLASMA:
+                drawPlasma(canvas);
+                break;
+            case EFFECT_SNOW:
+                drawSnow(canvas);
+                break;
+            case EFFECT_VORTEX:
+                drawVortex(canvas);
+                break;
+            case EFFECT_RIPPLES:
+                drawRipples(canvas);
+                break;
+            case EFFECT_BEAMS:
+                drawLightBeams(canvas);
+                break;
+            case EFFECT_FLOW:
+                drawLiquidFlow(canvas);
+                break;
+            case EFFECT_CONSTELLATION:
+                drawConstellation(canvas);
+                break;
+            default:
+                break;
+        }
+        if (!mPreviewMode) postInvalidateOnAnimation();
+    }
+
+    private float[] mParticleX;
+    private float[] mParticleY;
+
+    /** Warm drifting motes, each on its own slow orbit. */
+    private void drawFireflies(Canvas canvas) {
+        fillBase(canvas, 0xFF070A05);
+        final long t = System.currentTimeMillis();
+        final int count = 26;
+        ensureParticles(count);
+        final float w = getWidth();
+        final float h = getHeight();
+        mEffectPaint.setStyle(Paint.Style.FILL);
+        mEffectPaint.setShader(null);
+        for (int i = 0; i < count; i++) {
+            float phase = (float) ((t / 4200.0) + i * 0.37);
+            float x = (float) ((0.5 + 0.42 * Math.sin(phase * 1.3 + i)) * w);
+            float y = (float) ((0.5 + 0.45 * Math.cos(phase + i * 0.7)) * h);
+            float pulse = (float) (0.55 + 0.45 * Math.sin(t / 700.0 + i));
+            int alpha = (int) (90 + 150 * pulse);
+            mEffectPaint.setColor((alpha << 24) | 0x00FFD98A);
+            canvas.drawCircle(x, y, 1.6f + 2.2f * pulse, mEffectPaint);
+        }
+    }
+
+    /** Slow plasma bands drifting across the panel. */
+    private void drawPlasma(Canvas canvas) {
+        fillBase(canvas, 0xFF08030F);
+        final long t = System.currentTimeMillis();
+        final float w = getWidth();
+        final float h = getHeight();
+        if (w <= 0 || h <= 0) return;
+        mEffectPaint.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < 4; i++) {
+            float shift = (float) Math.sin(t / 2600.0 + i * 1.4);
+            float y = (0.15f + i * 0.2f) * h + shift * h * 0.05f;
+            int c1 = Color.argb(115, 120, 40, 210);
+            int c0 = Color.argb(0, 40, 10, 90);
+            mEffectPaint.setShader(new LinearGradient(0, y - h * 0.18f, 0, y + h * 0.18f,
+                    new int[]{c0, c1, c0}, new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP));
+            canvas.drawRect(0, y - h * 0.18f, w, y + h * 0.18f, mEffectPaint);
+        }
+        mEffectPaint.setShader(null);
+    }
+
+    /** Falling snow with a gentle sideways drift. */
+    private void drawSnow(Canvas canvas) {
+        fillBase(canvas, 0xFF0A1018);
+        final long t = System.currentTimeMillis();
+        final int count = 90;
+        ensureParticles(count);
+        final float w = getWidth();
+        final float h = getHeight();
+        mEffectPaint.setShader(null);
+        mEffectPaint.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < count; i++) {
+            float speed = 26f + (i % 7) * 18f;
+            float y = (t / 1000f * speed + i * 53f) % Math.max(1f, h);
+            float x = (i * 71f + (float) Math.sin(t / 1700.0 + i) * 34f) % Math.max(1f, w);
+            mEffectPaint.setColor((0xA0 + (i % 6) * 16) << 24 | 0x00F4FAFF);
+            canvas.drawCircle(x, y, 1.6f + (i % 4) * 0.9f, mEffectPaint);
+        }
+    }
+
+    /** Rotating spiral arms around the panel centre. */
+    private void drawVortex(Canvas canvas) {
+        fillBase(canvas, 0xFF05010A);
+        final long t = System.currentTimeMillis();
+        final float cx = getWidth() / 2f;
+        final float cy = getHeight() / 2f;
+        if (cx <= 0 || cy <= 0) return;
+        final float maxR = (float) Math.hypot(cx, cy);
+        mEffectPaint.setShader(null);
+        mEffectPaint.setStyle(Paint.Style.STROKE);
+        for (int arm = 0; arm < 3; arm++) {
+            Path path = new Path();
+            for (int step = 0; step <= 90; step++) {
+                float r = maxR * step / 90f;
+                double angle = t / 2400.0 + arm * 2.094 + step * 0.09;
+                float x = cx + (float) (Math.cos(angle) * r * 0.9);
+                float y = cy + (float) (Math.sin(angle) * r * 0.9);
+                if (step == 0) path.moveTo(x, y); else path.lineTo(x, y);
+            }
+            mEffectPaint.setStrokeWidth(2.2f);
+            mEffectPaint.setColor(arm == 0 ? 0x7745C8FF : (arm == 1 ? 0x666C5CFF : 0x5540E0C0));
+            canvas.drawPath(path, mEffectPaint);
+        }
+    }
+
+    /** Expanding rings rising from the bottom edge, like water disturbed in the dark. */
+    private void drawRipples(Canvas canvas) {
+        fillBase(canvas, 0xFF04141A);
+        final long t = System.currentTimeMillis();
+        final float w = getWidth();
+        final float h = getHeight();
+        if (w <= 0 || h <= 0) return;
+        final float cx = w / 2f;
+        final float cy = h * 0.92f;
+        final float maxR = Math.max(w, h) * 0.9f;
+        mEffectPaint.setShader(null);
+        mEffectPaint.setStyle(Paint.Style.STROKE);
+        for (int i = 0; i < 7; i++) {
+            float phase = (float) ((t / 1600.0 + i * 0.42) % 1.0);
+            float radius = 24f + phase * maxR;
+            int alpha = (int) (150 * (1.0 - phase));
+            mEffectPaint.setStrokeWidth(1.5f + 3.5f * (1f - phase));
+            mEffectPaint.setColor((alpha << 24) | 0x0056E0D6);
+            canvas.drawOval(cx - radius, cy - radius * 0.62f,
+                    cx + radius, cy + radius * 0.62f, mEffectPaint);
+            canvas.drawOval(cx - radius * 0.55f, cy - radius * 0.34f,
+                    cx + radius * 0.55f, cy + radius * 0.34f, mEffectPaint);
+        }
+    }
+
+    /** Slow searchlight beams sweeping across the panel from below. */
+    private void drawLightBeams(Canvas canvas) {
+        fillBase(canvas, 0xFF080611);
+        final long t = System.currentTimeMillis();
+        final float w = getWidth();
+        final float h = getHeight();
+        if (w <= 0 || h <= 0) return;
+        final float pivotX = w * 0.5f;
+        final float pivotY = h * 1.18f;
+        mEffectPaint.setShader(null);
+        mEffectPaint.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < 5; i++) {
+            double angle = t / 2600.0 + i * 0.62;
+            float spread = 0.11f;
+            float reach = h * 1.9f;
+            float x1 = pivotX + (float) Math.cos(angle - spread) * reach;
+            float y1 = pivotY + (float) Math.sin(angle - spread) * reach;
+            float x2 = pivotX + (float) Math.cos(angle + spread) * reach;
+            float y2 = pivotY + (float) Math.sin(angle + spread) * reach;
+            int tint = (i % 2 == 0) ? 0x00FFD9A0 : 0x009BD8FF;
+            Path beam = new Path();
+            beam.moveTo(pivotX, pivotY);
+            beam.lineTo(x1, y1);
+            beam.lineTo(x2, y2);
+            beam.close();
+            mEffectPaint.setShader(new LinearGradient(pivotX, pivotY,
+                    (x1 + x2) / 2f, (y1 + y2) / 2f,
+                    new int[]{0x44FFFFFF, 0x22FFFFFF, 0x00FFFFFF}, null,
+                    Shader.TileMode.CLAMP));
+            mEffectPaint.setColor(tint);
+            canvas.drawPath(beam, mEffectPaint);
+        }
+        mEffectPaint.setShader(null);
+    }
+
+    /** Silky ribbons of colour drifting sideways over a deep base. */
+    private void drawLiquidFlow(Canvas canvas) {
+        fillBase(canvas, 0xFF040A0E);
+        final long t = System.currentTimeMillis();
+        final float w = getWidth();
+        final float h = getHeight();
+        if (w <= 0 || h <= 0) return;
+        mEffectPaint.setStyle(Paint.Style.STROKE);
+        mEffectPaint.setStrokeWidth(Math.max(2f, h / 42f));
+        final int[] colors = {0x6684F2C8, 0x669BB7FF, 0x66E0A6FF, 0x66FFC98A};
+        for (int band = 0; band < 7; band++) {
+            Path path = new Path();
+            float baseY = h * (0.18f + band * 0.11f);
+            for (int step = 0; step <= 24; step++) {
+                float x = w * step / 24f;
+                double y = baseY
+                        + Math.sin(step * 0.42 + t / 1900.0 + band) * h * 0.045
+                        + Math.sin(step * 0.17 - t / 2600.0 + band * 0.7) * h * 0.03;
+                if (step == 0) path.moveTo(x, (float) y); else path.lineTo(x, (float) y);
+            }
+            mEffectPaint.setColor(colors[band % colors.length]);
+            canvas.drawPath(path, mEffectPaint);
+        }
+    }
+
+    /** Faint stars joined into a slowly drifting constellation. */
+    private void drawConstellation(Canvas canvas) {
+        fillBase(canvas, 0xFF05070E);
+        final long t = System.currentTimeMillis();
+        final float w = getWidth();
+        final float h = getHeight();
+        if (w <= 0 || h <= 0) return;
+        final int count = 32;
+        float[] xs = new float[count];
+        float[] ys = new float[count];
+        for (int i = 0; i < count; i++) {
+            float seedX = ((i * 73) % 97) / 97f;
+            float seedY = ((i * 41 + 17) % 89) / 89f;
+            xs[i] = (seedX * 0.92f + 0.04f) * w + (float) Math.sin(t / 5200.0 + i) * 6f;
+            ys[i] = (seedY * 0.86f + 0.07f) * h + (float) Math.cos(t / 4700.0 + i) * 5f;
+        }
+        mEffectPaint.setStyle(Paint.Style.STROKE);
+        mEffectPaint.setStrokeWidth(1f);
+        mEffectPaint.setColor(0x2E9FC4FF);
+        final float link = Math.min(w, h) * 0.24f;
+        for (int i = 0; i < count; i++) {
+            for (int j = i + 1; j < count; j++) {
+                if (Math.hypot(xs[i] - xs[j], ys[i] - ys[j]) < link) {
+                    canvas.drawLine(xs[i], ys[i], xs[j], ys[j], mEffectPaint);
+                }
+            }
+        }
+        mEffectPaint.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < count; i++) {
+            float twinkle = (float) (0.5 + 0.5 * Math.sin(t / 900.0 + i * 1.7));
+            mEffectPaint.setColor(((int) (110 + 140 * twinkle) << 24) | 0x00E8F2FF);
+            canvas.drawCircle(xs[i], ys[i], 1.4f + 1.8f * twinkle, mEffectPaint);
+        }
+    }
+
+    private void ensureParticles(int count) {
+        if (mParticleX == null || mParticleX.length < count) {
+            mParticleX = new float[count];
+            mParticleY = new float[count];
+        }
+    }
+
+    private static final int THEME_WOOD = 12;
+
+    private boolean isWoodTheme() {
+        return LatinIME.sKeyboardSettings != null
+                && LatinIME.sKeyboardSettings.keyboardTheme == THEME_WOOD;
+    }
+
+    /** Procedural wood fibre: wavy grain lines over the panel and each cap. */
+    private void drawWoodGrain(Canvas canvas, float left, float top, float right, float bottom,
+                               int alpha) {
+        final float width = right - left;
+        final float height = bottom - top;
+        if (width <= 0 || height <= 0) return;
+
+        mEffectPaint.setShader(null);
+        mEffectPaint.setStyle(Paint.Style.STROKE);
+        final int lines = Math.max(8, (int) (height / 9));
+        for (int i = 0; i < lines; i++) {
+            final float baseY = top + (i + 0.5f) * height / lines;
+            final float amp = 1.2f + (i % 5) * 1.3f;
+            final float phase = i * 0.7f;
+            Path path = new Path();
+            path.moveTo(left, baseY);
+            for (float x = 0; x <= width; x += 8) {
+                float y = baseY + (float) Math.sin(x / 34f + phase) * amp
+                        + (float) Math.sin(x / 9f + phase * 2f) * (amp * 0.35f);
+                path.lineTo(left + x, y);
+            }
+            final boolean dark = (i % 3) != 0;
+            mEffectPaint.setColor(dark
+                    ? Color.argb(alpha, 52, 28, 12)
+                    : Color.argb(Math.max(1, alpha / 2), 226, 178, 118));
+            mEffectPaint.setStrokeWidth(dark ? 1.7f : 1.0f);
+            canvas.drawPath(path, mEffectPaint);
+        }
+    }
+
+    /** Slow drifting stars on a near-black sky. */
+    private void drawStarfield(Canvas canvas) {
+        final int width = getWidth();
+        final int height = getHeight();
+        if (width <= 0 || height <= 0) return;
+
+        final int starCount = Math.max(60, width * height / 9000);
+        if (mStarX == null || mStarX.length != starCount) {
+            mStarX = new float[starCount];
+            mStarY = new float[starCount];
+            mStarSpeed = new float[starCount];
+            Random random = new Random();
+            for (int i = 0; i < starCount; i++) {
+                mStarX[i] = random.nextFloat() * width;
+                mStarY[i] = random.nextFloat() * height;
+                mStarSpeed[i] = (6 + random.nextInt(22)) / 1000f;
+            }
+        }
+
+        final long now = System.currentTimeMillis();
+        final float delta = mEffectClock == 0 ? 16 : Math.min(64, now - mEffectClock);
+        mEffectClock = now;
+
+        fillBase(canvas, 0xFF03060C);
+        mEffectPaint.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < mStarX.length; i++) {
+            mStarY[i] += mStarSpeed[i] * delta;
+            if (mStarY[i] > height + 4) {
+                mStarY[i] = -4;
+                mStarX[i] = (float) Math.random() * width;
+            }
+            int alpha = 110 + (i % 6) * 24;
+            mEffectPaint.setColor((alpha << 24) | 0x00E6F2FF);
+            canvas.drawCircle(mStarX[i], mStarY[i], 1.2f + (i % 4) * 0.7f, mEffectPaint);
+        }
+    }
+
+    /** Three drifting colour bands, like a slow aurora. */
+    private void drawAurora(Canvas canvas) {
+        final int width = getWidth();
+        final int height = getHeight();
+        if (width <= 0 || height <= 0) return;
+
+        fillBase(canvas, 0xFF05060A);
+        final long time = System.currentTimeMillis();
+        mEffectPaint.setStyle(Paint.Style.FILL);
+
+        for (int band = 0; band < 3; band++) {
+            final float phase = (time % 14000) / 14000f * 6.2832f + band * 2.1f;
+            final float top = height * (0.18f + 0.16f * (float) Math.sin(phase));
+            final float bottom = top + height * (0.45f + 0.1f * (float) Math.cos(phase + 1f));
+            final float hue = ((time / 90f) + band * 110) % 360;
+            final int solid = Color.HSVToColor(new float[] {hue, 0.72f, 0.92f});
+            final int clear = solid & 0x00FFFFFF;
+            mEffectPaint.setShader(new LinearGradient(0, top, 0, bottom, solid, clear,
+                    Shader.TileMode.CLAMP));
+            canvas.drawRect(0, top, width, bottom, mEffectPaint);
+            mEffectPaint.setShader(null);
+        }
+    }
+
+    /** Diagonal rain streaks with bright heads. */
+    private void drawRainEffect(Canvas canvas) {
+        final int width = getWidth();
+        final int height = getHeight();
+        if (width <= 0 || height <= 0) return;
+        fillBase(canvas, 0xFF050B14);
+
+        final float density = getResources().getDisplayMetrics().density;
+        final long time = System.currentTimeMillis();
+        mEffectPaint.setStyle(Paint.Style.STROKE);
+        mEffectPaint.setStrokeWidth(1.6f * density);
+        for (int i = 0; i < 90; i++) {
+            float x = ((i * 97) % width + (time * 0.05f) % width) % width;
+            float y = (((i * 53) % height) + time * 0.30f) % (height + 200) - 100;
+            int alpha = 30 + (i % 6) * 20;
+            mEffectPaint.setColor((alpha << 24) | 0x7FB8FF);
+            canvas.drawLine(x, y, x - 9 * density, y + 44 * density, mEffectPaint);
+        }
+    }
+
+    /** Soft bubbles drifting upward. */
+    private void drawBubblesEffect(Canvas canvas) {
+        final int width = getWidth();
+        final int height = getHeight();
+        if (width <= 0 || height <= 0) return;
+        fillBase(canvas, 0xFF071018);
+
+        final float density = getResources().getDisplayMetrics().density;
+        final long time = System.currentTimeMillis();
+        mEffectPaint.setStyle(Paint.Style.STROKE);
+        mEffectPaint.setStrokeWidth(1.4f * density);
+        for (int i = 0; i < 26; i++) {
+            float x = (i * 71) % width;
+            float drift = (float) Math.sin((time / 1400f) + i) * 12 * density;
+            float y = height - (((i * 61) + time * 0.05f) % (height + 200));
+            float radius = (5 + (i % 5) * 4) * density;
+            int alpha = 24 + (i % 4) * 14;
+            mEffectPaint.setColor((alpha << 24) | 0x9FE8FF);
+            canvas.drawCircle(x + drift, y, radius, mEffectPaint);
+        }
+    }
+
+    /** Synthwave perspective grid scrolling toward the viewer. */
+    private void drawNeonGrid(Canvas canvas) {
+        final int width = getWidth();
+        final int height = getHeight();
+        if (width <= 0 || height <= 0) return;
+        fillBase(canvas, 0xFF0B0616);
+
+        final float density = getResources().getDisplayMetrics().density;
+        final long time = System.currentTimeMillis();
+        final float horizon = height * 0.32f;
+
+        mEffectPaint.setStyle(Paint.Style.STROKE);
+        mEffectPaint.setStrokeWidth(1.2f * density);
+        mEffectPaint.setColor(0x66FF3CB4);
+
+        for (int i = 1; i <= 12; i++) {
+            float t = i / 12f;
+            float y = horizon + (height - horizon) * t * t;
+            canvas.drawLine(0, y, width, y, mEffectPaint);
+        }
+        float offset = (time * 0.05f) % (width / 10f);
+        for (int i = -10; i <= 10; i++) {
+            float x = width / 2f + i * (width / 10f) + offset;
+            canvas.drawLine(width / 2f, horizon, x, height, mEffectPaint);
+        }
+    }
+
+    /** CRT look: dim scanlines with a bright band sweeping down. */
+    private void drawScanlines(Canvas canvas) {
+        final int width = getWidth();
+        final int height = getHeight();
+        if (width <= 0 || height <= 0) return;
+
+        fillBase(canvas, 0xFF02060A);
+        final long time = System.currentTimeMillis();
+        final float sweep = (time % 2400) / 2400f * (height + 240) - 120;
+
+        mEffectPaint.setStyle(Paint.Style.FILL);
+        mEffectPaint.setShader(new LinearGradient(0, sweep - 110, 0, sweep + 110,
+                0x0000FF9A, 0x4400FF9A, Shader.TileMode.CLAMP));
+        canvas.drawRect(0, sweep - 110, width, sweep + 110, mEffectPaint);
+        mEffectPaint.setShader(null);
+
+        final float step = 4 * getResources().getDisplayMetrics().density;
+        mEffectPaint.setColor(0x59000000);
+        for (float y = 0; y < height; y += step) {
+            canvas.drawRect(0, y, width, y + 1.5f * getResources().getDisplayMetrics().density,
+                    mEffectPaint);
+        }
+    }
+
+    /**
+     * Draws the Matrix-style rain behind the keys and schedules the next frame.
+     * The head of each column is brightest and the trail fades out above it.
+     */
+    private void drawMatrixEffect(Canvas canvas) {
+        final int width = getWidth();
+        final int height = getHeight();
+        if (width <= 0 || height <= 0) return;
+
+        final float density = getResources().getDisplayMetrics().density;
+        final float cell = 20 * density;
+        final int columns = Math.max(1, (int) (width / cell));
+        if (mMatrixHead == null || mMatrixColumns != columns) {
+            mMatrixHead = new float[columns];
+            mMatrixSpeed = new float[columns];
+            mMatrixGlyph = new char[columns];
+            mMatrixColumns = columns;
+            Random random = new Random();
+            for (int i = 0; i < columns; i++) {
+                mMatrixHead[i] = -random.nextInt(Math.max(1, height));
+                mMatrixSpeed[i] = (140 + random.nextInt(260)) / 1000f;
+                mMatrixGlyph[i] = MATRIX_ALPHABET[random.nextInt(MATRIX_ALPHABET.length)];
+            }
+        }
+
+        final long now = System.currentTimeMillis();
+        float delta = mMatrixLastFrame == 0 ? 16 : Math.min(64, now - mMatrixLastFrame);
+        mMatrixLastFrame = now;
+
+        fillBase(canvas, 0xFF000000);
+        mMatrixPaint.setTextSize(cell * 0.78f);
+
+        for (int i = 0; i < mMatrixColumns; i++) {
+            mMatrixHead[i] += mMatrixSpeed[i] * delta;
+            if (mMatrixHead[i] - cell * 12 > height) {
+                mMatrixHead[i] = -cell * (2 + (float) Math.random() * 12);
+                mMatrixSpeed[i] = (140 + (float) Math.random() * 260) / 1000f;
+            }
+            if (Math.random() < 0.03) {
+                mMatrixGlyph[i] = MATRIX_ALPHABET[(int) (Math.random() * MATRIX_ALPHABET.length)];
+            }
+
+            final float x = i * cell + cell / 2f;
+            for (int trail = 0; trail < 12; trail++) {
+                final float y = mMatrixHead[i] - trail * cell;
+                if (y < -cell || y > height + cell) continue;
+                if (trail == 0) {
+                    mMatrixPaint.setColor(0xFFD8FFE4);
+                } else {
+                    int alpha = Math.max(0, 210 - trail * 17);
+                    mMatrixPaint.setColor((alpha << 24) | 0x0033FF66);
+                }
+                char glyph = trail == 0
+                        ? mMatrixGlyph[i]
+                        : MATRIX_ALPHABET[(i * 31 + trail * 17) % MATRIX_ALPHABET.length];
+                canvas.drawText(String.valueOf(glyph), x, y, mMatrixPaint);
+            }
+        }
+
+    }
+
+    /** Label colour from the "Key letter colour" setting, or the theme colour. */
+    private int getKeyTextColor() {
+        int pref = LatinIME.sKeyboardSettings == null ? 0 : LatinIME.sKeyboardSettings.keyTextColor;
+        if (pref > 0 && pref < KEY_TEXT_COLORS.length) {
+            return KEY_TEXT_COLORS[pref];
+        }
+        return mKeyTextColor;
+    }
+
+    /** Optional macOS-style symbols for the modifier keys. */
+    /** Windows-style modifiers: ⊞ for the Windows key, plain Alt, Esc, Caps. */
+    private String windowsGlyph(int style, int code, String text, String label) {
+        final boolean spelled = style == 7;
+        if (code == LatinKeyboardView.KEYCODE_CTRL_LEFT || "ctrl".equalsIgnoreCase(text)
+                || "control".equalsIgnoreCase(text)) {
+            return spelled ? "Control" : "Ctrl";
+        }
+        if (code == LatinKeyboardView.KEYCODE_ALT_LEFT || "alt".equalsIgnoreCase(text)) {
+            return "Alt";
+        }
+        if (code == LatinKeyboardView.KEYCODE_META_LEFT || "meta".equalsIgnoreCase(text)
+                || "win".equalsIgnoreCase(text)) {
+            // The four-pane Windows mark, not Apple's command symbol.
+            return spelled ? "Windows" : "\u229E";
+        }
+        if (code == LatinKeyboardView.KEYCODE_FN || "fn".equalsIgnoreCase(text)) {
+            return spelled ? "Function" : "Fn";
+        }
+        if (code == 27 || "esc".equalsIgnoreCase(text)) {
+            return spelled ? "Escape" : "Esc";
+        }
+        if (code == 9 || "tab".equalsIgnoreCase(text)) return "Tab";
+        if (code == 10 || code == 13 || "enter".equalsIgnoreCase(text)) return "Enter";
+        if (code == Keyboard.KEYCODE_SHIFT || "caps".equalsIgnoreCase(text)) {
+            return spelled ? "Caps Lock" : "Caps";
+        }
+        switch (code) {
+            case 19: return "\u2191";
+            case 20: return "\u2193";
+            case 21: return "\u2190";
+            case 22: return "\u2192";
+            case 23: return "\u00b7";
+            default: break;
+        }
+        return label;
+    }
+
+    private String applyGlyphStyle(String label, int[] codes) {
+        if (LatinIME.sKeyboardSettings == null || LatinIME.sKeyboardSettings.keyGlyphs == 0) {
+            return label;
+        }
+        final int style = LatinIME.sKeyboardSettings.keyGlyphs;
+        final int code = (codes != null && codes.length > 0) ? codes[0] : 0;
+        final String text = label == null ? "" : label;
+
+        // Modifier keys are identified by code, not by their label text.
+        if (code == LatinKeyboardView.KEYCODE_CTRL_LEFT || "ctrl".equalsIgnoreCase(text)
+                || "control".equalsIgnoreCase(text)) {
+            switch (style) {
+                case 1: return "\u2303";          // ⌃
+                case 2: return "Ctl";
+                case 3: return "Control";
+                case 4: return "\u2388";          // ⎈
+                case 5: return "ctrl";
+                default: break;
+            }
+        }
+        if (code == LatinKeyboardView.KEYCODE_ALT_LEFT || "alt".equalsIgnoreCase(text)
+                || "option".equalsIgnoreCase(text)) {
+            switch (style) {
+                case 1: case 4: return "\u2325";  // ⌥
+                case 2: return "Alt";
+                case 3: return "Option";
+                case 5: return "alt";
+                default: break;
+            }
+        }
+        if (code == LatinKeyboardView.KEYCODE_META_LEFT || "meta".equalsIgnoreCase(text)
+                || "super".equalsIgnoreCase(text) || "win".equalsIgnoreCase(text)) {
+            switch (style) {
+                case 1: case 4: return "\u2318";  // ⌘ Command
+                case 2: return "Meta";
+                case 3: return "Command";
+                case 5: return "cmd";
+                default: break;
+            }
+        }
+        if (code == LatinKeyboardView.KEYCODE_FN || "fn".equalsIgnoreCase(text)) {
+            switch (style) {
+                case 1: return "fn";
+                case 4: return "\u0192";          // ƒ
+                case 3: return "Function";
+                case 5: return "fn";
+                default: break;
+            }
+        }
+        if (code == 27 || "esc".equalsIgnoreCase(text) || "escape".equalsIgnoreCase(text)) {
+            switch (style) {
+                case 1: return "esc";
+                case 4: return "\u238b";          // ⎋
+                case 3: return "Escape";
+                case 5: return "esc";
+                default: break;
+            }
+        }
+        if (code == 9 || "tab".equalsIgnoreCase(text)) {
+            switch (style) {
+                case 1: case 4: return "\u21e5";  // ⇥
+                case 2: return "Tab";
+                case 3: return "Tab";
+                case 5: return "tab";
+                default: break;
+            }
+        }
+        if (code == 10 || code == 13 || "enter".equalsIgnoreCase(text)
+                || "return".equalsIgnoreCase(text)) {
+            switch (style) {
+                case 1: return "\u23ce";          // ⏎
+                case 4: return "\u2386";          // ⎆
+                case 3: return "Return";
+                case 5: return "enter";
+                default: break;
+            }
+        }
+        if (code == Keyboard.KEYCODE_SHIFT || "caps".equalsIgnoreCase(text)) {
+            switch (style) {
+                case 1: case 4: return "\u21ea";  // ⇪
+                case 3: return "Caps Lock";
+                case 5: return "caps";
+                default: break;
+            }
+        }
+        // Arrow / D-pad keys (Android keycodes 19-23) follow the glyph style too.
+        if (code >= 19 && code <= 23) {
+            final String up, down, left, right, centre;
+            switch (style) {
+                case 1:  up = "\u2191"; down = "\u2193"; left = "\u2190"; right = "\u2192"; centre = "\u00b7"; break;
+                case 2:  up = "\u25b2"; down = "\u25bc"; left = "\u25c0"; right = "\u25b6"; centre = "\u25cf"; break;
+                case 3:  up = "Up";       down = "Down";     left = "Left";     right = "Right";   centre = "Click"; break;
+                case 4:  up = "\u2b06"; down = "\u2b07"; left = "\u2b05"; right = "\u27a1"; centre = "\u2b24"; break;
+                case 5:  up = "\u2191"; down = "\u2193"; left = "\u2190"; right = "\u2192"; centre = "\u00b7"; break;
+                default: up = null; down = null; left = null; right = null; centre = null; break;
+            }
+            switch (code) {
+                case 19: return up != null ? up : label;
+                case 20: return down != null ? down : label;
+                case 21: return left != null ? left : label;
+                case 22: return right != null ? right : label;
+                case 23: return centre != null ? centre : label;
+                default: break;
+            }
+        }
+        if (style == 3) {
+            return label;
+        }
+        if (style == 5 && text.length() > 0) {
+            return text.toLowerCase(java.util.Locale.US);
+        }
+        return label;
+    }
+
+    /** Typeface for key labels, honouring the "Key font" setting. */
+    private Typeface getLabelTypeface(boolean wordLabel) {
+        int font = LatinIME.sKeyboardSettings == null ? 0 : LatinIME.sKeyboardSettings.keyFont;
+        if (font <= 0) {
+            return wordLabel ? Typeface.DEFAULT : mKeyTextStyle;
+        }
+        return LABEL_TYPEFACES[Math.min(font, LABEL_TYPEFACES.length - 1)];
     }
 
     private boolean openPopupIfRequired(int keyIndex, PointerTracker tracker) {

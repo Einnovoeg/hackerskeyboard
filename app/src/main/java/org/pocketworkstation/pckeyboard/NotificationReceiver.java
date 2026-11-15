@@ -24,14 +24,16 @@ public class NotificationReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         Log.i(TAG, "NotificationReceiver.onReceive called, action=" + action);
 
-        if (action.equals(ACTION_SHOW)) {
+        if (ACTION_SHOW.equals(action)) {
             InputMethodManager imm = (InputMethodManager)
                 context.getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) {
                 imm.showSoftInputFromInputMethod(mIME.mToken, InputMethodManager.SHOW_FORCED);
             }
-        } else if (action.equals(ACTION_SETTINGS)) {
-            context.startActivity(new Intent(mIME, LatinIMESettings.class));
+        } else if (ACTION_SETTINGS.equals(action)) {
+            Intent settings = new Intent(mIME, LatinIMESettings.class);
+            settings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(settings);
         }
     }
 }

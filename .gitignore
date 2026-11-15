@@ -1,13 +1,39 @@
+# Gradle / Android build output
+.gradle/
+.gradle-home/
+build/
+app/build/
+/app/release/
+.cxx/
+.externalNativeBuild/
+captures/
+
+# Local machine configuration (SDK path, signing)
+local.properties
+*.jks
+*.keystore
+keystore.properties
+
+# IDE
 *.iml
-.gradle
-/local.properties
-/.idea
-/.idea/caches/build_file_checksums.ser
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
+.idea/
+out/
+
+# Session and agent notes (kept locally, never published)
+sessions*.md
+AGENTS.md
+
+# Development-only helpers and captures
+tools/
+screenshots/
+original-screenshots/
+*.log
+
+# Release artifacts and private signing material
+dist/
+signing/
+.signing-credentials
+
+# OS clutter
 .DS_Store
-/build
-/captures
-gradle
-.externalNativeBuild
+Thumbs.db
