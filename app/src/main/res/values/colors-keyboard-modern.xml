@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Modern Dark -->
+    <color name="kb_modern_dark_panel">#12151A</color>
+    <color name="kb_modern_dark_key">#262B33</color>
+    <color name="kb_modern_dark_key_pressed">#3C4653</color>
+    <color name="kb_modern_dark_key_active">#2F4E96</color>
+    <color name="kb_modern_dark_key_text">#F3F6FA</color>
+    <color name="kb_modern_dark_key_hint">#93A1B5</color>
+
+    <!-- Modern Light -->
+    <color name="kb_modern_light_panel">#E9EDF3</color>
+    <color name="kb_modern_light_key">#FFFFFF</color>
+    <color name="kb_modern_light_key_pressed">#CBD5E3</color>
+    <color name="kb_modern_light_key_active">#C7D7F7</color>
+    <color name="kb_modern_light_key_text">#151A21</color>
+    <color name="kb_modern_light_key_hint">#5B6878</color>
+
+    <!-- Modern Clear: translucent keycaps over a fully transparent panel. -->
+    <color name="kb_modern_clear_key">#59000000</color>
+    <color name="kb_modern_clear_key_pressed">#A6000000</color>
+    <color name="kb_modern_clear_key_active">#B32F4E96</color>
+    <color name="kb_modern_clear_key_text">#FFFFFFFF</color>
+    <color name="kb_modern_clear_key_hint">#B3FFFFFF</color>
+    <!-- Outlines so adjacent keys stay visually separate. -->
+    <color name="kb_modern_dark_key_stroke">#3E4A59</color>
+    <color name="kb_modern_dark_key_pressed_stroke">#566375</color>
+    <color name="kb_modern_dark_key_active_stroke">#6E8FD0</color>
+    <color name="kb_modern_light_key_stroke">#C2CBD8</color>
+    <color name="kb_modern_light_key_pressed_stroke">#9AA9BD</color>
+    <color name="kb_modern_light_key_active_stroke">#7C97CC</color>
+    <color name="kb_modern_clear_key_stroke">#66FFFFFF</color>
+    <color name="kb_modern_clear_key_pressed_stroke">#99FFFFFF</color>
+    <color name="kb_modern_clear_key_active_stroke">#B3A9C6F2</color>
+    <!-- Modern OLED: true black panel and caps, edges only. -->
+    <color name="kb_modern_oled_panel">#000000</color>
+    <color name="kb_modern_oled_key">#000000</color>
+    <color name="kb_modern_oled_key_pressed">#1F1F1F</color>
+    <color name="kb_modern_oled_key_active">#16305C</color>
+    <color name="kb_modern_oled_key_text">#FFFFFF</color>
+    <color name="kb_modern_oled_key_hint">#8A9099</color>
+    <color name="kb_modern_oled_key_stroke">#2B2B2B</color>
+    <color name="kb_modern_oled_key_pressed_stroke">#4A4A4A</color>
+    <color name="kb_modern_oled_key_active_stroke">#3C67B0</color>
+    <color name="kb_wood_panel">#2A1B10</color>
+    <color name="kb_wood_key">#4A3320</color>
+    <color name="kb_wood_key_pressed">#5E4128</color>
+    <color name="kb_wood_key_active">#8A5A2B</color>
+    <color name="kb_wood_key_text">#F2E4D0</color>
+    <color name="kb_wood_key_hint">#C0A585</color>
+    <color name="kb_wood_key_stroke">#67482C</color>
+    <color name="kb_wood_key_pressed_stroke">#8A6238</color>
+    <color name="kb_wood_key_active_stroke">#B07C43</color>
+    <color name="kb_ocean_panel">#04121E</color>
+    <color name="kb_ocean_key">#0C2436</color>
+    <color name="kb_ocean_key_pressed">#123349</color>
+    <color name="kb_ocean_key_active">#0E5C7A</color>
+    <color name="kb_ocean_key_text">#DCF2FF</color>
+    <color name="kb_ocean_key_hint">#7FA8BF</color>
+    <color name="kb_ocean_key_stroke">#17415A</color>
+    <color name="kb_ocean_key_pressed_stroke">#2A6480</color>
+    <color name="kb_ocean_key_active_stroke">#39A7C9</color>
+    <color name="kb_forest_panel">#0C1A10</color>
+    <color name="kb_forest_key">#16301D</color>
+    <color name="kb_forest_key_pressed">#1E4028</color>
+    <color name="kb_forest_key_active">#2C6B3C</color>
+    <color name="kb_forest_key_text">#E4F5E7</color>
+    <color name="kb_forest_key_hint">#93B79B</color>
+    <color name="kb_forest_key_stroke">#295038</color>
+    <color name="kb_forest_key_pressed_stroke">#3B6E4A</color>
+    <color name="kb_forest_key_active_stroke">#5AA86E</color>
+    <color name="kb_sunset_panel">#1C1024</color>
+    <color name="kb_sunset_key">#33203C</color>
+    <color name="kb_sunset_key_pressed">#452B50</color>
+    <color name="kb_sunset_key_active">#7A3C6B</color>
+    <color name="kb_sunset_key_text">#FFE9F4</color>
+    <color name="kb_sunset_key_hint">#C39BB4</color>
+    <color name="kb_sunset_key_stroke">#513360</color>
+    <color name="kb_sunset_key_pressed_stroke">#7A4A88</color>
+    <color name="kb_sunset_key_active_stroke">#C05B9B</color>
+    <color name="kb_nebula_panel">#120E22</color>
+    <color name="kb_nebula_key">#241C3D</color>
+    <color name="kb_nebula_key_pressed">#1B152D</color>
+    <color name="kb_nebula_key_active">#7C4DFF</color>
+    <color name="kb_nebula_key_text">#EDE7FF</color>
+    <color name="kb_nebula_key_hint">#A09BB1</color>
+    <color name="kb_nebula_key_stroke">#423B58</color>
+    <color name="kb_nebula_key_pressed_stroke">#544D67</color>
+    <color name="kb_nebula_key_active_stroke">#9C79FF</color>
+    <color name="kb_rose_panel">#1C1014</color>
+    <color name="kb_rose_key">#33202A</color>
+    <color name="kb_rose_key_pressed">#26181F</color>
+    <color name="kb_rose_key_active">#E85D8A</color>
+    <color name="kb_rose_key_text">#FFE9EF</color>
+    <color name="kb_rose_key_hint">#AF9DA2</color>
+    <color name="kb_rose_key_stroke">#4F3F47</color>
+    <color name="kb_rose_key_pressed_stroke">#5F5158</color>
+    <color name="kb_rose_key_active_stroke">#ED85A7</color>
+    <color name="kb_sandstone_panel">#1A1510</color>
+    <color name="kb_sandstone_key">#33291D</color>
+    <color name="kb_sandstone_key_pressed">#261E15</color>
+    <color name="kb_sandstone_key_active">#D9A566</color>
+    <color name="kb_sandstone_key_text">#F6EADB</color>
+    <color name="kb_sandstone_key_hint">#A99F93</color>
+    <color name="kb_sandstone_key_stroke">#4F463C</color>
+    <color name="kb_sandstone_key_pressed_stroke">#5F584E</color>
+    <color name="kb_sandstone_key_active_stroke">#E2BB8C</color>
+    <color name="kb_midnight_panel">#07121B</color>
+    <color name="kb_midnight_key">#102433</color>
+    <color name="kb_midnight_key_pressed">#0C1B26</color>
+    <color name="kb_midnight_key_active">#2EC4B6</color>
+    <color name="kb_midnight_key_text">#E4F6F5</color>
+    <color name="kb_midnight_key_hint">#96A6A8</color>
+    <color name="kb_midnight_key_stroke">#31424F</color>
+    <color name="kb_midnight_key_pressed_stroke">#44545F</color>
+    <color name="kb_midnight_key_active_stroke">#62D2C8</color>
+    <color name="kb_ics_key">#1B1B1B</color>
+    <color name="kb_ics_key_pressed">#2E2E2E</color>
+    <color name="kb_ics_key_text">#EDEDED</color>
+    <color name="kb_ics_key_stroke">#3A3A3A</color>
+    <color name="kb_ics_panel">#141414</color>
+    <color name="kb_gingerbread_key">#262626</color>
+    <color name="kb_gingerbread_key_pressed">#383838</color>
+    <color name="kb_gingerbread_key_text">#F0F0F0</color>
+    <color name="kb_gingerbread_key_stroke">#454545</color>
+    <color name="kb_gingerbread_panel">#1A1A1A</color>
+    <color name="kb_stone_bold_key">#2B2B2B</color>
+    <color name="kb_stone_bold_key_pressed">#3C3C3C</color>
+    <color name="kb_stone_bold_key_text">#F2F2F2</color>
+    <color name="kb_stone_bold_key_stroke">#4A4A4A</color>
+    <color name="kb_stone_bold_panel">#1E1E1E</color>
+    <color name="kb_trans_neon_key">#33000000</color>
+    <color name="kb_trans_neon_key_pressed">#5512FF66</color>
+    <color name="kb_trans_neon_key_text">#7CFFB2</color>
+    <color name="kb_trans_neon_key_stroke">#3312FF66</color>
+    <color name="kb_trans_neon_panel">#22000000</color>
+    <color name="kb_material_dark_key">#2D2D30</color>
+    <color name="kb_material_dark_key_pressed">#3E3E42</color>
+    <color name="kb_material_dark_key_text">#F1F1F1</color>
+    <color name="kb_material_dark_key_stroke">#4A4A4F</color>
+    <color name="kb_material_dark_panel">#1E1E20</color>
+    <color name="kb_material_light_key">#F7F7F7</color>
+    <color name="kb_material_light_key_pressed">#E4E4E4</color>
+    <color name="kb_material_light_key_text">#202020</color>
+    <color name="kb_material_light_key_stroke">#CFCFCF</color>
+    <color name="kb_material_light_panel">#EDEDED</color>
+    <color name="kb_ics_darker_key">#101010</color>
+    <color name="kb_ics_darker_key_pressed">#1E1E1E</color>
+    <color name="kb_ics_darker_key_text">#E8E8E8</color>
+    <color name="kb_ics_darker_key_stroke">#2A2A2A</color>
+    <color name="kb_ics_darker_panel">#050505</color>
+    <color name="kb_material_black_key">#000000</color>
+    <color name="kb_material_black_key_pressed">#1A1A1A</color>
+    <color name="kb_material_black_key_text">#DADADA</color>
+    <color name="kb_material_black_key_stroke">#2A2A2A</color>
+    <color name="kb_material_black_panel">#000000</color>
+    <color name="kb_modern_clear_panel">#99000000</color>
+<!-- Aurora -->
+    <color name="kb_aurora_panel">#0B1220</color>
+    <color name="kb_aurora_key">#1B2C4A</color>
+    <color name="kb_aurora_key_pressed">#2A4166</color>
+    <color name="kb_aurora_key_active">#2E5F96</color>
+    <color name="kb_aurora_key_text">#EAF6FF</color>
+    <color name="kb_aurora_key_hint">#9FB6D1</color>
+    <color name="kb_aurora_key_stroke">#2B4260</color>
+    <color name="kb_aurora_key_pressed_stroke">#3C5C85</color>
+    <color name="kb_aurora_key_active_stroke">#6FB3E0</color>
+
+    <!-- Cyberpunk -->
+    <color name="kb_cyberpunk_panel">#12061B</color>
+    <color name="kb_cyberpunk_key">#2A1140</color>
+    <color name="kb_cyberpunk_key_pressed">#40205F</color>
+    <color name="kb_cyberpunk_key_active">#6A1F8C</color>
+    <color name="kb_cyberpunk_key_text">#F7E9FF</color>
+    <color name="kb_cyberpunk_key_hint">#C79BE0</color>
+    <color name="kb_cyberpunk_key_stroke">#4A1F6E</color>
+    <color name="kb_cyberpunk_key_pressed_stroke">#6B2F9B</color>
+    <color name="kb_cyberpunk_key_active_stroke">#FF2D95</color>
+
+    <!-- Paper -->
+    <color name="kb_paper_panel">#F4F1EA</color>
+    <color name="kb_paper_key">#FFFFFB</color>
+    <color name="kb_paper_key_pressed">#E9E2D4</color>
+    <color name="kb_paper_key_active">#DCE8FF</color>
+    <color name="kb_paper_key_text">#2A2620</color>
+    <color name="kb_paper_key_hint">#6B655C</color>
+    <color name="kb_paper_key_stroke">#D8D2C6</color>
+    <color name="kb_paper_key_pressed_stroke">#C9C2B4</color>
+    <color name="kb_paper_key_active_stroke">#9BB4DF</color>
+
+    <!-- Carbon -->
+    <color name="kb_carbon_panel">#0A0A0B</color>
+    <color name="kb_carbon_key">#26292D</color>
+    <color name="kb_carbon_key_pressed">#34383D</color>
+    <color name="kb_carbon_key_active">#4A4F55</color>
+    <color name="kb_carbon_key_text">#F2F4F6</color>
+    <color name="kb_carbon_key_hint">#9BA1A8</color>
+    <color name="kb_carbon_key_stroke">#34383D</color>
+    <color name="kb_carbon_key_pressed_stroke">#474C52</color>
+    <color name="kb_carbon_key_active_stroke">#6E757D</color>
+
+    <!-- Lagoon -->
+    <color name="kb_lagoon_panel">#07181C</color>
+    <color name="kb_lagoon_key">#0F2F36</color>
+    <color name="kb_lagoon_key_pressed">#154049</color>
+    <color name="kb_lagoon_key_active">#1D5560</color>
+    <color name="kb_lagoon_key_text">#E6FBFF</color>
+    <color name="kb_lagoon_key_hint">#82B8C4</color>
+    <color name="kb_lagoon_key_stroke">#1B3D45</color>
+    <color name="kb_lagoon_key_pressed_stroke">#24505A</color>
+    <color name="kb_lagoon_key_active_stroke">#3E8A98</color>
+
+    <!-- Ember -->
+    <color name="kb_ember_panel">#1B0C07</color>
+    <color name="kb_ember_key">#33190F</color>
+    <color name="kb_ember_key_pressed">#452317</color>
+    <color name="kb_ember_key_active">#5A2F1F</color>
+    <color name="kb_ember_key_text">#FFEFE6</color>
+    <color name="kb_ember_key_hint">#C09A86</color>
+    <color name="kb_ember_key_stroke">#3D221A</color>
+    <color name="kb_ember_key_pressed_stroke">#55301F</color>
+    <color name="kb_ember_key_active_stroke">#A85C38</color>
+
+    <!-- Cobalt -->
+    <color name="kb_cobalt_panel">#0A1533</color>
+    <color name="kb_cobalt_key">#131F44</color>
+    <color name="kb_cobalt_key_pressed">#1B2B5C</color>
+    <color name="kb_cobalt_key_active">#24407F</color>
+    <color name="kb_cobalt_key_text">#EAF1FF</color>
+    <color name="kb_cobalt_key_hint">#8FA1D0</color>
+    <color name="kb_cobalt_key_stroke">#1C2C55</color>
+    <color name="kb_cobalt_key_pressed_stroke">#28407A</color>
+    <color name="kb_cobalt_key_active_stroke">#4A6CC4</color>
+
+    <!-- Blossom -->
+    <color name="kb_blossom_panel">#22101D</color>
+    <color name="kb_blossom_key">#341F33</color>
+    <color name="kb_blossom_key_pressed">#43293F</color>
+    <color name="kb_blossom_key_active">#573552</color>
+    <color name="kb_blossom_key_text">#FFEDF6</color>
+    <color name="kb_blossom_key_hint">#C9A0B8</color>
+    <color name="kb_blossom_key_stroke">#43283C</color>
+    <color name="kb_blossom_key_pressed_stroke">#5A3A50</color>
+    <color name="kb_blossom_key_active_stroke">#A45C86</color>
+
+    <!-- Glacier -->
+    <color name="kb_glacier_panel">#F2F9FF</color>
+    <color name="kb_glacier_key">#FFFFFF</color>
+    <color name="kb_glacier_key_pressed">#E2EEF7</color>
+    <color name="kb_glacier_key_active">#CFE7F7</color>
+    <color name="kb_glacier_key_text">#12303D</color>
+    <color name="kb_glacier_key_hint">#5F7C8A</color>
+    <color name="kb_glacier_key_stroke">#C9DDE9</color>
+    <color name="kb_glacier_key_pressed_stroke">#B4CCDC</color>
+    <color name="kb_glacier_key_active_stroke">#79B3D6</color>
+
+    <!-- Obsidian -->
+    <color name="kb_obsidian_panel">#0A0A0C</color>
+    <color name="kb_obsidian_key">#17171A</color>
+    <color name="kb_obsidian_key_pressed">#202024</color>
+    <color name="kb_obsidian_key_active">#2C2C31</color>
+    <color name="kb_obsidian_key_text">#F5F3EE</color>
+    <color name="kb_obsidian_key_hint">#A39A86</color>
+    <color name="kb_obsidian_key_stroke">#2C2C31</color>
+    <color name="kb_obsidian_key_pressed_stroke">#3A3A40</color>
+    <color name="kb_obsidian_key_active_stroke">#C9A24A</color>
+</resources>

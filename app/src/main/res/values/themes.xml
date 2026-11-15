@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.HackersKeyboard" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="colorPrimary">@color/hk_accent</item>
+        <item name="colorOnPrimary">@color/hk_on_accent</item>
+        <item name="colorPrimaryContainer">@color/hk_accent_container</item>
+        <item name="colorOnPrimaryContainer">@color/hk_on_accent_container</item>
+        <item name="colorSurface">@color/hk_surface</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+    </style>
+
+</resources>

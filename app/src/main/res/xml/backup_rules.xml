@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <include domain="sharedpref" path="." />
+    <!-- Clipboard, snippets, macros and the learned word pairs stay on device. -->
+    <exclude domain="sharedpref" path="hk_clipboard.xml" />
+    <exclude domain="sharedpref" path="hk_snippets.xml" />
+    <exclude domain="sharedpref" path="hk_macros.xml" />
+    <exclude domain="sharedpref" path="hk_context.xml" />
+</full-backup-content>

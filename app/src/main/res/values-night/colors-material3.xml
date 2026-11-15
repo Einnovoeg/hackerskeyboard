@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="hk_accent">#A9C2FF</color>
+    <color name="hk_on_accent">#10244F</color>
+    <color name="hk_accent_container">#27406F</color>
+    <color name="hk_on_accent_container">#DCE3FF</color>
+    <color name="hk_surface">#111318</color>
+    <color name="hk_status_ok">#7BD8A4</color>
+    <color name="hk_status_pending">#F3BB74</color>
+</resources>

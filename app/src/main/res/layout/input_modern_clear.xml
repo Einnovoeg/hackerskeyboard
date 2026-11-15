@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+** Modern Clear: transparent panel so the app behind shows through, with
+** translucent keycaps.
+*/
+-->
+
+<org.pocketworkstation.pckeyboard.LatinKeyboardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:latin="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/LatinkeyboardBaseView"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        latin:keyTextColor="@color/kb_modern_clear_key_text"
+        latin:keyHintColor="@color/kb_modern_clear_key_hint"
+        latin:keyBackground="@drawable/btn_keyboard_key_modern_clear"
+        latin:keyBorderColor="@color/kb_modern_clear_key_stroke"
+        latin:popupLayout="@layout/input_popup_modern_dark"
+        />

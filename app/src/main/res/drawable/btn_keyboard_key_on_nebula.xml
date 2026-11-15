@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:startColor="#FF397991"
+        android:endColor="#FF0C526D" />
+    <corners android:radius="9dp" />
+    <stroke android:width="1dp" android:color="@color/kb_nebula_key_active_stroke" />
+</shape>
