@@ -1,0 +1,7 @@
+Key click samples in this directory are extracted from the keyboard sound packs
+shipped with Mechvibes (https://github.com/hainguyents13/mechvibes), which is
+distributed under the MIT License. Pack author: Mechvibes.
+
+Each pack directory contains seven mono 16-bit 44.1 kHz WAV slices taken from the
+pack's own audio at the timings given in its config.json: four letter-key
+variations (KeyA, KeyS, KeyD, KeyF) plus Space, Enter and Backspace.
