@@ -1,0 +1,25 @@
+HACK3RS K3YB0ARD 3.0
+Copyright 2026 HACK3RS K3YB0ARD 3.0 contributors
+
+This product is a derivative work of Hacker's Keyboard:
+    Copyright Klaus Weidner and contributors
+    https://github.com/klausw/hackerskeyboard
+    Licensed under the Apache License, Version 2.0.
+
+It also contains work derived from the Android Open Source Project
+Gingerbread keyboard and LatinIME:
+    Copyright (C) 2008-2010 The Android Open Source Project
+    Licensed under the Apache License, Version 2.0.
+
+Third-party components:
+    AndroidX, Material Components for Android
+        Copyright The Android Open Source Project
+        Apache License, Version 2.0
+    Mechvibes key-click samples (app/src/main/assets/keysounds)
+        Copyright Mechvibes contributors, MIT License
+        https://github.com/hainguyents13/mechvibes
+    See app/src/main/assets/keysounds/NOTICE.txt for the sample provenance.
+
+The full Apache License 2.0 text is in the LICENSE file. You may reuse,
+modify and redistribute this software provided that you retain the copyright
+notices and licence texts above.
