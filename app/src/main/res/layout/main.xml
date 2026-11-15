@@ -1,46 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent" android:layout_height="match_parent"
-	android:orientation="vertical">
-	<!--
-	  <TextView android:layout_height="wrap_content" android:id="@+id/main_intro"
-		  android:text="@string/english_ime_name" android:layout_width="wrap_content"
-		  android:textStyle="bold" android:textSize="25sp"></TextView>
-	-->
-	<TableLayout android:layout_width="match_parent"
-		android:id="@+id/main_linear1" android:layout_height="wrap_content">
-		<TableRow>
-			<Button android:text="@string/main_setup_configure_imes"
-				android:id="@+id/main_setup_btn_configure_imes"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-			<Button android:text="@string/main_setup_input_lang"
-				android:id="@+id/main_setup_btn_input_lang"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-		</TableRow>
-		<TableRow>
-			<Button android:text="@string/main_setup_set_ime"
-				android:id="@+id/main_setup_btn_set_ime"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-			<Button android:text="@string/main_setup_get_dicts"
-				android:id="@+id/main_setup_btn_get_dicts"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-		</TableRow>
-		<TableRow>
-			<Button android:text="@string/main_setup_settings"
-				android:id="@+id/main_setup_btn_settings"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-			<EditText android:text="@string/main_setup_test"
-				android:id="@+id/main_setup_edit_test"
-				android:layout_width="fill_parent"
-				android:gravity="center"
-				android:layout_height="wrap_content" />
-		</TableRow>
-	</TableLayout>
-	<TextView android:layout_height="wrap_content" android:id="@+id/main_description"
-		android:layout_width="wrap_content" />
-</LinearLayout>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        android:elevation="4dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/main_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="@string/english_ime_name"
+            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <View
+        android:id="@+id/main_status_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="?attr/colorSurface"
+        android:elevation="8dp" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/main_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="32dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/main_headline"
+                android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/main_subhead"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/main_status_title"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+                    <TextView
+                        android:id="@+id/main_status_enabled"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/main_status_disabled"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+                    <TextView
+                        android:id="@+id/main_status_selected"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/main_status_not_selected"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/main_setup_btn_configure_imes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/main_setup_enable_ime" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/main_setup_btn_set_ime"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/main_setup_set_ime" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/main_personalize_title"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/main_setup_btn_settings"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/main_setup_settings" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/main_setup_btn_input_lang"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/main_setup_input_lang" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/main_try_title"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:hint="@string/main_try_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/main_setup_edit_test"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textMultiLine"
+                            android:minLines="2"
+                            android:gravity="top|start" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/main_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:lineSpacingMultiplier="1.15" />
+
+            <TextView
+                android:id="@+id/main_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/main_setup_btn_get_dicts"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/main_setup_get_dicts" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

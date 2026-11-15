@@ -46,7 +46,7 @@
     <dimen name="mini_keyboard_slide_allowance">0.553in</dimen>
     <!-- popup_key_height x 1.0 -->
     <dimen name="mini_keyboard_vertical_correction">-0.325in</dimen>
-    <dimen name="key_hysteresis_distance">0.05in</dimen>
+    <dimen name="key_hysteresis_distance">0.09in</dimen>
     <!-- We use "inch", not "dip" because this value tries dealing with physical distance related
          to user's finger. -->
     <dimen name="keyboard_vertical_correction">-0.05in</dimen>

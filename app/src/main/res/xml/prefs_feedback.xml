@@ -19,10 +19,84 @@
         android:title="@string/pref_screen_feedback_title"
         android:key="feedback_settings">
 
-    <CheckBoxPreference
-            android:key="vibrate_on"
-            android:title="@string/vibrate_on_keypress"
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_typing"
+        android:title="@string/settings_group_typing" >
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_speak"
+            android:key="pref_speak_keys"
+            android:title="@string/title_speak_keys"
+            android:summary="@string/summary_speak_keys"
             android:persistent="true"
+            android:defaultValue="false"
+            />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_autocorrect_strength"
+            android:entries="@array/autocorrect_strength_entries"
+            android:entryValues="@array/autocorrect_strength_values"
+            android:icon="@drawable/ic_hk_autocorrect"
+            android:key="pref_autocorrect_strength"
+            android:persistent="true"
+            android:title="@string/title_autocorrect_strength"
+            />
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="1.0"
+            hk:minValue="0"
+            hk:maxValue="1"
+            hk:asPercent="true"
+            android:icon="@drawable/ic_hk_speak"
+            android:key="pref_speak_volume"
+            android:persistent="true"
+            android:title="@string/title_speak_volume"
+            android:summary="@string/summary_speak_volume" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_speak"
+            android:key="pref_speak_words"
+            android:title="@string/title_speak_words"
+            android:summary="@string/summary_speak_words"
+            android:persistent="true"
+            android:defaultValue="false"
+            />
+
+        <Preference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_speak"
+            android:key="pref_voice_settings"
+            android:persistent="false"
+            android:title="@string/title_voice_settings"
+            android:summary="@string/summary_voice_settings" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_terminal"
+            android:key="pref_terminal_safe"
+            android:title="@string/title_terminal_safe"
+            android:summary="@string/summary_terminal_safe"
+            android:persistent="true"
+            android:defaultValue="true"
+            />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:key="popup_on"
+            android:title="@string/popup_on_keypress"
+            android:persistent="true"
+            android:defaultValue="@bool/default_popup_preview"
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_sound_vibration"
+        android:title="@string/settings_group_sound" >
+
+    <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_autocorrect"
+            android:key="vibrate_on"
+            android:title="@string/title_vibrate_on"
+            android:summary="@string/summary_vibrate_on"
+            android:persistent="true"
+            android:defaultValue="true"
             />
 
     <org.pocketworkstation.pckeyboard.VibratePreference		
@@ -36,13 +110,25 @@
             android:persistent="true"
             />
 
-    <CheckBoxPreference
+    <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_speak"
             android:key="sound_on"
-            android:title="@string/sound_on_keypress"
+            android:title="@string/title_sound_on"
+            android:summary="@string/summary_sound_on"
             android:persistent="true" 
+            android:defaultValue="true"
             />
 
-    <org.pocketworkstation.pckeyboard.AutoSummaryListPreference
+    <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:key="pref_key_sound_profile"
+            android:title="@string/title_key_sound_profile"
+            android:entryValues="@array/key_sound_profile_values"
+            android:entries="@array/key_sound_profile_entries"
+            android:defaultValue="@string/default_key_sound_profile"
+            android:persistent="true"
+            />
+
+    <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
             android:key="pref_click_method"
             android:title="@string/title_click_method"
             android:entryValues="@array/click_method_values"
@@ -51,7 +137,7 @@
             android:persistent="true"
             />
     
-    <org.pocketworkstation.pckeyboard.SeekBarPreferenceString
+    <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
             android:defaultValue="@string/default_click_volume"
             hk:minValue="0"
             hk:maxValue="1"
@@ -61,11 +147,6 @@
             android:persistent="true"
             />
 
-    <CheckBoxPreference
-            android:key="popup_on"
-            android:title="@string/popup_on_keypress"
-            android:persistent="true"
-            android:defaultValue="@bool/default_popup_preview"
-            />
+    </PreferenceCategory>
 
 </PreferenceScreen>

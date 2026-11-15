@@ -152,7 +152,8 @@
             android:isModifier="true"
             android:keyEdgeFlags="left" />
         <Key
-            android:codes="@integer/key_f1"
+            android:codes="@integer/key_gamepad"
+            android:keyLabel="GP"
             android:isModifier="true" />
         <Key
             android:codes="@integer/key_space"
