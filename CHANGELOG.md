@@ -28,10 +28,10 @@ panel with a hidden tribute.
 - **30 themes** in total, including six new palettes: Lagoon, Ember, Cobalt,
   Blossom, Glacier and Obsidian, each with matching keyboard layouts, colours and
   preview backgrounds.
-- **25 high-resolution backgrounds**, including six new 2160 × 4800 artworks
+- **24 high-resolution backgrounds**, including six new 2160 × 4800 artworks
   (Lagoon light, Ember glow, Cobalt depths, Blossom haze, Glacier facets and
   Obsidian gold).
-- **16 background animations**, including the new Ripples, Light beams, Liquid flow
+- **15 background animations**, including the new Ripples, Light beams, Liquid flow
   and Constellation effects, alongside Matrix rain, Starfield, Aurora, Scanlines,
   Rain, Bubbles, Neon grid, Fireflies, Plasma, Snow and Vortex.
 - Background dimming slider with live preview.

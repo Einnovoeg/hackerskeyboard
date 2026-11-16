@@ -50,7 +50,7 @@ controls how long alternate characters take to appear.
 - **Background animation** — 16 options: None, Matrix rain, Starfield, Aurora,
   Scanlines, Rain, Bubbles, Neon grid, Fireflies, Plasma, Snow, Vortex, Ripples,
   Light beams, Liquid flow and Constellation.
-- **Background image** — 25 high-resolution artworks, including the 2160 × 4800
+- **Background image** — 24 high-resolution artworks, including the 2160 × 4800
   3.0 set. Choose **None** to use the theme background.
 - **Background dim** — darkens the image or animation so key labels stay readable.
 - **Live preview** — shows the current image, dimming and key styling.

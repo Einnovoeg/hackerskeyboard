@@ -29,9 +29,9 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
 - **30 themes**, including modern dark/light/OLED, glass, wood, ocean, forest,
   nebula, carbon, and six new palettes: Lagoon, Ember, Cobalt, Blossom, Glacier and
   Obsidian.
-- **25 high-resolution background images** (2160 × 4800 art, drawn as gradients and
+- **24 high-resolution background images** (2160 × 4800 art, drawn as gradients and
   vector-style compositions so they stay sharp at 1080 × 2400 and above).
-- **16 background animations**: matrix rain, starfield, aurora, scanlines, rain,
+- **15 background animations**: matrix rain, starfield, aurora, scanlines, rain,
   bubbles, neon grid, fireflies, plasma, snow, vortex, ripples, light beams, liquid
   flow and constellation.
 - Per-element styling: key glyph style, key cap style, key letter colour, font,
@@ -49,7 +49,7 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
 
 ## Screenshots
 
-| Keyboard | 25 background images | Hackerman easter egg |
+| Keyboard | 24 background images | Hackerman easter egg |
 | --- | --- | --- |
 | ![Keyboard](docs/screenshots/keyboard.png) | ![Backgrounds](docs/screenshots/backgrounds.png) | ![Hackerman](docs/screenshots/hackerman.png) |
 
@@ -116,8 +116,8 @@ Settings are grouped, searchable and preview live:
 - **Key layout options** — show the settings key, voice input, input languages.
 - **Key behaviour** — auto-capitalisation, auto-correct, double-space period,
   chording, long-press behaviour.
-- **Keyboard customization** — theme, key glyphs/style/colour/font, 25 background
-  images, 16 animations, dimming, key radius, opacity, shadow, scaling, one-handed
+- **Keyboard customization** — theme, key glyphs/style/colour/font, 24 background
+  images, 15 animations, dimming, key radius, opacity, shadow, scaling, one-handed
   mode and gamepad appearance.
 - **Input and feedback** — key sounds, haptics and spoken feedback.
 - **Gamepad** — glyph set, pad theme, pad background, swap sides, live preview.
