@@ -822,6 +822,25 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     }
 
     /**
+     * Narrows the key grid for one-handed mode. Padding decides which side the
+     * keys are aligned to; the view itself still fills the IME window so the
+     * background art covers the empty side too.
+     */
+    public void setHorizontalScale(float scale) {
+        if (mKeyboard == null) return;
+        mKeyboard.setHorizontalScale(scale);
+        // Touch coordinates are view coordinates, so compensate for the empty
+        // side's padding before asking the keyboard which key was hit.
+        mKeys = mKeyDetector.setKeyboard(mKeyboard, -getPaddingLeft(), 0);
+        for (PointerTracker tracker : mPointerTrackers) {
+            tracker.setKeyboard(mKeys, mKeyHysteresisDistance);
+        }
+        computeProximityThreshold(mKeyboard);
+        requestLayout();
+        invalidateAllKeys();
+    }
+
+    /**
      * Return whether the device has distinct multi-touch panel.
      * @return true if the device has distinct multi-touch panel.
      */

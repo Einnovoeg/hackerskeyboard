@@ -745,25 +745,30 @@ public class LatinIME extends InputMethodService implements
         mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_TEXT, 0,
                 shouldShowVoiceButton(getCurrentInputEditorInfo()));
         View inputView = mKeyboardSwitcher.getInputView();
-        applyOneHanded(inputView);
+        applyOneHanded(inputView, this);
         return inputView;
     }
 
-    /** Narrows the keyboard to one side so it can be reached with one thumb. */
-    private void applyOneHanded(View view) {
+    /**
+     * Narrows the keyboard to one side so it can be reached with one thumb.
+     * Called whenever the view gets a new keyboard, including theme and
+     * language changes, so the empty side never comes back unexpectedly.
+     */
+    static void applyOneHanded(View view, Context context) {
         if (view == null) return;
-        String mode = PreferenceManager.getDefaultSharedPreferences(this)
+        String mode = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString("pref_one_handed", "off");
         int pad = 0;
+        float scale = 1f;
         if ("left".equals(mode) || "right".equals(mode)) {
-            pad = (int) (getResources().getDisplayMetrics().widthPixels * 0.24f);
+            pad = (int) (context.getResources().getDisplayMetrics().widthPixels * 0.24f);
+            scale = 0.76f;
         }
-        if ("left".equals(mode)) {
-            view.setPadding(0, view.getPaddingTop(), pad, view.getPaddingBottom());
-        } else if ("right".equals(mode)) {
-            view.setPadding(pad, view.getPaddingTop(), 0, view.getPaddingBottom());
-        } else {
-            view.setPadding(0, view.getPaddingTop(), 0, view.getPaddingBottom());
+        int left = "right".equals(mode) ? pad : 0;
+        int right = "left".equals(mode) ? pad : 0;
+        view.setPadding(left, view.getPaddingTop(), right, view.getPaddingBottom());
+        if (view instanceof LatinKeyboardBaseView) {
+            ((LatinKeyboardBaseView) view).setHorizontalScale(scale);
         }
     }
 
@@ -3187,7 +3192,7 @@ public class LatinIME extends InputMethodService implements
             }
         }
         if ("pref_one_handed".equals(key)) {
-            applyOneHanded(mKeyboardSwitcher.getInputView());
+            applyOneHanded(mKeyboardSwitcher.getInputView(), this);
         }
     }
 

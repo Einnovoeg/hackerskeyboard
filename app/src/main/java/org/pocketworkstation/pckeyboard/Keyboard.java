@@ -136,6 +136,7 @@ public class Keyboard {
      * right side.
      */
     private int mTotalWidth;
+    private float mHorizontalScale = 1f;
 
     /** List of keys in this keyboard */
     private List<Key> mKeys;
@@ -1245,6 +1246,26 @@ public class Keyboard {
             e.printStackTrace();
         }
         mTotalHeight = y - mDefaultVerticalGap;
+    }
+
+    /**
+     * Scales the key grid horizontally, used by one-handed mode. The view keeps
+     * its full width so the theme background still fills the window; only the
+     * keys are narrowed and aligned to one side by the view's padding.
+     */
+    public void setHorizontalScale(float scale) {
+        if (scale <= 0f) scale = 1f;
+        if (Math.abs(scale - mHorizontalScale) < 0.0001f) return;
+        final float ratio = scale / mHorizontalScale;
+        for (Key key : mKeys) {
+            key.x = Math.round(key.x * ratio);
+            key.width = Math.round(key.width * ratio);
+        }
+        mTotalWidth = Math.round(mTotalWidth * ratio);
+        mHorizontalScale = scale;
+        mGridNeighbors = null;
+        final int threshold = (int) (mDefaultWidth * mHorizontalScale * SEARCH_DISTANCE);
+        mProximityThreshold = threshold * threshold;
     }
 
     public void setKeyboardWidth(int newWidth) {

@@ -72,6 +72,9 @@ panel with a hidden tribute.
   session.
 - One-handed mode did not refresh while the keyboard was open and could crash when
   no input view existed.
+- One-handed mode kept the keyboard at full width and clipped the rightmost keys;
+  it now narrows and scales the key grid so left and right modes both fit the
+  screen, including after theme changes and rotation.
 - Duplicate preference-category identifier in the main settings screen.
 - Duplicate sound/vibration controls appeared in both appearance and feedback
   screens; they now live only in the feedback screen.
@@ -89,6 +92,9 @@ panel with a hidden tribute.
   catalogue counts, entry/value parity and drawable index safety.
 - `:app:assembleDebug` and `:app:assembleRelease` build successfully.
 - Release APK is signed and verified with `apksigner`.
+- On-device checks on a Motorola moto g 2025 (Android 16): installation, IME
+  activation, typing, settings search, theme/background/animation changes,
+  one-handed left/right modes and rotation, with no crashes or ANRs.
 
 ### Known limitations
 - Gesture typing is not implemented.
@@ -96,8 +102,8 @@ panel with a hidden tribute.
 - Some translations do not cover the new 3.0 settings.
 - The gamepad panel sends key events; a few games that read the physical controller
   API will not detect it.
-- Hardware verification was performed manually on one Pixel device; wider device
-  coverage and accessibility improvements are still wanted.
+- Hardware verification was performed manually on a Motorola moto g 2025 running
+  Android 16; wider device coverage and accessibility improvements are still wanted.
 
 ### Upgrade notes
 - The package name remains `org.pocketworkstation.pckeyboard`, so existing settings

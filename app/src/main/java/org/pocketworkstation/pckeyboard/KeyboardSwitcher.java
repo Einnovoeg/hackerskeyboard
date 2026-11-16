@@ -346,6 +346,7 @@ public class KeyboardSwitcher implements
 
         mCurrentId = id;
         mInputView.setKeyboard(keyboard);
+        LatinIME.applyOneHanded(mInputView, mInputMethodService);
         keyboard.setShiftState(Keyboard.SHIFT_OFF);
         keyboard.setImeOptions(mInputMethodService.getResources(), mMode,
                 imeOptions);
