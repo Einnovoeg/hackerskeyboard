@@ -101,6 +101,7 @@ public class LatinIME extends InputMethodService implements
     private static final String PREF_VIBRATE_ON = "vibrate_on";
     static final String PREF_VIBRATE_LEN = "vibrate_len";
     private static final String PREF_SOUND_ON = "sound_on";
+    private static final String PREF_MUTE_WHEN_MUTED = "pref_mute_when_muted";
     private static final String PREF_POPUP_ON = "popup_on";
     private static final String PREF_AUTO_CAP = "auto_cap";
     private static final String PREF_QUICK_FIXES = "quick_fixes";
@@ -205,6 +206,7 @@ public class LatinIME extends InputMethodService implements
     private boolean mVibrateOn;
     private int mVibrateLen;
     private boolean mSoundOn;
+    private boolean mMuteWhenMuted = true;
     private boolean mPopupOn;
     private boolean mAutoCapPref;
     private boolean mAutoCapActive;
@@ -455,9 +457,11 @@ public class LatinIME extends InputMethodService implements
 
         mOrientation = conf.orientation;
 
-        // register to receive ringer mode changes for silent mode
-        IntentFilter filter = new IntentFilter(
-                AudioManager.RINGER_MODE_CHANGED_ACTION);
+        // Register for the system states that make key clicks inaudible or unwanted.
+        IntentFilter filter = new IntentFilter(AudioManager.RINGER_MODE_CHANGED_ACTION);
+        filter.addAction("android.media.VOLUME_CHANGED_ACTION");
+        filter.addAction("android.media.MASTER_MUTE_CHANGED_ACTION");
+        filter.addAction("android.media.STREAM_MUTE_CHANGED_ACTION");
         ContextCompat.registerReceiver(this, mReceiver, filter,
                 ContextCompat.RECEIVER_NOT_EXPORTED);
         prefs.registerOnSharedPreferenceChangeListener(this);
@@ -3222,6 +3226,9 @@ public class LatinIME extends InputMethodService implements
             mVolDownAction = sharedPreferences.getString(PREF_VOL_DOWN, res.getString(R.string.default_vol_down));
         } else if (PREF_VIBRATE_LEN.equals(key)) {
             mVibrateLen = getPrefInt(sharedPreferences, PREF_VIBRATE_LEN, getResources().getString(R.string.vibrate_duration_ms));
+        } else if (PREF_MUTE_WHEN_MUTED.equals(key)) {
+            mMuteWhenMuted = sharedPreferences.getBoolean(PREF_MUTE_WHEN_MUTED, true);
+            updateRingerMode();
         }
 
         updateKeyboardOptions();
@@ -3437,14 +3444,24 @@ public class LatinIME extends InputMethodService implements
         }
     };
 
-    // update flags for silent mode
+    // Update the cached mute state from the ringer, master mute and stream volumes.
     private void updateRingerMode() {
         if (mAudioManager == null) {
             mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         }
-        if (mAudioManager != null) {
-            mSilentMode = (mAudioManager.getRingerMode() != AudioManager.RINGER_MODE_NORMAL);
+        if (mAudioManager == null) return;
+        boolean muted = false;
+        try {
+            muted = mAudioManager.getRingerMode() != AudioManager.RINGER_MODE_NORMAL
+                    || mAudioManager.isStreamMute(AudioManager.STREAM_MUSIC)
+                    || mAudioManager.isStreamMute(AudioManager.STREAM_SYSTEM)
+                    || mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC) == 0
+                    || mAudioManager.getStreamVolume(AudioManager.STREAM_SYSTEM) == 0;
+        } catch (RuntimeException ignored) {
+            // Some OEM audio stacks reject individual queries; keep the last state.
+            return;
         }
+        mSilentMode = mMuteWhenMuted && muted;
     }
 
     private float getKeyClickVolume() {
@@ -3608,6 +3625,7 @@ public class LatinIME extends InputMethodService implements
 
     private void speakKey(int primaryCode) {
         if (!speechModeOn()) return;
+        if (mSilentMode) return;
         if (mTts == null) {
             initTts();
             return;
@@ -3805,6 +3823,8 @@ public class LatinIME extends InputMethodService implements
         mVibrateOn = sp.getBoolean(PREF_VIBRATE_ON, true);
         mVibrateLen = getPrefInt(sp, PREF_VIBRATE_LEN, getResources().getString(R.string.vibrate_duration_ms));
         mSoundOn = sp.getBoolean(PREF_SOUND_ON, true);
+        mMuteWhenMuted = sp.getBoolean(PREF_MUTE_WHEN_MUTED, true);
+        updateRingerMode();
         mPopupOn = sp.getBoolean(PREF_POPUP_ON, mResources
                 .getBoolean(R.bool.default_popup_preview));
         mAutoCapPref = sp.getBoolean(PREF_AUTO_CAP, getResources().getBoolean(

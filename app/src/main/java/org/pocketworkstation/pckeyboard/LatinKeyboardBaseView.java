@@ -1698,7 +1698,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
                 mPreviewText.setTypeface(Typeface.DEFAULT_BOLD);
             } else {
                 mPreviewText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mPreviewTextSizeLarge);
-                mPreviewText.setTypeface(mKeyTextStyle);
+                mPreviewText.setTypeface(getLabelTypeface(false));
             }
         }
         mPreviewText.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
@@ -2792,6 +2792,14 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     private Typeface getLabelTypeface(boolean wordLabel) {
         int font = LatinIME.sKeyboardSettings == null ? 0 : LatinIME.sKeyboardSettings.keyFont;
         if (font <= 0) {
+            return wordLabel ? Typeface.DEFAULT : mKeyTextStyle;
+        }
+        Typeface downloaded = DownloadedFonts.typefaceForIndex(getContext(), font);
+        if (downloaded != null) {
+            return downloaded;
+        }
+        if (font >= DownloadedFonts.FIRST_INDEX) {
+            // The font file was removed or could not be read; keep the keyboard usable.
             return wordLabel ? Typeface.DEFAULT : mKeyTextStyle;
         }
         return LABEL_TYPEFACES[Math.min(font, LABEL_TYPEFACES.length - 1)];

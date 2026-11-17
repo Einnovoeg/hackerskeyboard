@@ -2,6 +2,7 @@
 
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <uses-feature android:name="android.hardware.faketouch" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
@@ -100,6 +101,10 @@
         <activity android:name="BackgroundImageActivity"
                 android:exported="false"
                 android:label="@string/background_images_title" />
+
+        <activity android:name="FontLibraryActivity"
+                android:exported="false"
+                android:label="@string/title_font_library" />
 
         <activity android:name="PerAppThemeActivity"
                 android:exported="false"

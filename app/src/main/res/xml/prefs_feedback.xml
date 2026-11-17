@@ -35,6 +35,15 @@
             android:summary="@string/summary_sound_on"
             android:title="@string/title_sound_on" />
 
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="true"
+            android:icon="@drawable/ic_hk_speak"
+            android:key="pref_mute_when_muted"
+            android:persistent="true"
+            android:summaryOff="@string/summary_mute_when_muted_off"
+            android:summaryOn="@string/summary_mute_when_muted_on"
+            android:title="@string/title_mute_when_muted" />
+
         <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
             android:defaultValue="@string/default_key_sound_profile"
             android:entries="@array/key_sound_profile_entries"

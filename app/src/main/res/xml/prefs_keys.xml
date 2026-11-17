@@ -52,7 +52,7 @@
             android:persistent="true"
             android:title="@string/title_key_text_color" />
 
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+        <org.pocketworkstation.pckeyboard.DownloadableFontPreference android:layout="@layout/preference_hk"
             android:defaultValue="@string/default_key_font"
             android:entries="@array/key_font_entries"
             android:entryValues="@array/key_font_values"
@@ -60,6 +60,13 @@
             android:key="pref_key_font"
             android:persistent="true"
             android:title="@string/title_key_font" />
+
+        <Preference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_font"
+            android:key="pref_font_library"
+            android:persistent="false"
+            android:summary="@string/summary_font_library"
+            android:title="@string/title_font_library" />
 
         <CheckBoxPreference android:layout="@layout/preference_hk"
             android:defaultValue="false"

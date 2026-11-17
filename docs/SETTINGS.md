@@ -5,7 +5,7 @@ keyboard notification, or from **Settings → System → Languages & input →
 On-screen keyboard → HACK3RS K3YB0ARD 3.0**.
 
 The main screen is a searchable hub. **Search settings** finds any option by name or
-keyword (`oled`, `dvorak`, `orchid`, `tidal`, `accent`, `haptic`, `gamepad`) and
+keyword (`oled`, `dvorak`, `orchid`, `tidal`, `font`, `mute`, `haptic`, `gamepad`) and
 opens the grouped screen that contains it. Appearance changes are previewed on a
 live miniature of the real keyboard.
 
@@ -15,10 +15,10 @@ live miniature of the real keyboard.
 | --- | --- |
 | Theme & background | Themes, background art, background animations with speed and intensity, dimming, key-press accents and RGB lighting. |
 | Layout & sizing | Portrait/landscape keyboard mode and height, QWERTY/AZERTY/Dvorak, one-handed mode, label/suggestion scaling, fifth-row height, settings and voice keys. |
-| Keys & remapping | Per-layer key remapping, key glyph/style/colour/font, bold and tracking, hints, radius, opacity, shadow and shadow softness, key behaviour and long-press controls. |
+| Keys & remapping | Per-layer key remapping, key glyph/style/colour/font, the downloadable font library, bold and tracking, hints, radius, opacity, shadow and shadow softness, key behaviour and long-press controls. |
 | Typing & prediction | Input languages, suggestions, autocorrect strength, recorrection, terminal-safe typing and speech. |
 | Gesture and key actions | Swipe gestures and hardware volume-key actions. |
-| Sounds & haptics | Key sounds, sound packs, volume, vibration and the key preview popup. |
+| Sounds & haptics | Key sounds, sound packs, volume, mute-when-device-muted, vibration and the key preview popup. |
 | Tools & gamepad | Clipboard history, snippets, macros, per-app themes and gamepad appearance. |
 | Advanced | Input behaviour, fullscreen/notification options, render mode, diagnostics and version. |
 
@@ -32,7 +32,7 @@ appearance and feedback lists have been retired.
 **Keyboard Theme** offers 36 palettes. These include the original Gingerbread/ICS
 looks, Material dark/light/OLED, glass, wood, ocean, forest, sunset, nebula, rose,
 sandstone, midnight, aurora, cyberpunk, paper and carbon, the 3.0 palettes Lagoon,
-Ember, Cobalt, Blossom, Glacier and Obsidian, and the 3.0.2 palettes **Orchid,
+Ember, Cobalt, Blossom, Glacier and Obsidian, and the additional palettes **Orchid,
 Reef, Crimson, Arctic, Graphite and Solar**. Each palette includes matching key
 states, borders, hints, panel colours and a preview background.
 
@@ -122,11 +122,27 @@ symbols board includes an **ABC** return key.
 - **Key glyph style** — arrows/spelled modifiers, macOS/Windows symbols, compact
   labels, lowercase and other alternate glyph sets.
 - **Key style** — flat, outlined or raised.
-- **Key letter colour**, **Key font**, **Bold key labels**, **Label letter spacing**.
+- **Key letter colour**, **Key font** (built-in and downloaded typefaces), **Bold key
+  labels**, **Label letter spacing**.
+- **Font library** — preview and download 13 extra Google Fonts typefaces without
+  leaving the app.
 - **Labelled alternative keys** — whether alternate characters are printed on keys.
 - **Key corner radius**, **Key cap opacity**, **Key shadow depth** and **Key shadow
   softness** (0–16 dp). Shadow softness layers translucent shadows outward so raised
   caps can look crisp or softly diffused.
+
+### Font library
+
+The **Font library** row under Key font opens 13 extra typefaces from Google Fonts:
+**Space Mono, Bebas Neue, Anton, Press Start 2P, VT323, Righteous, Russo One,
+Pacifico, Lobster, Audiowide, Archivo Black, Playfair Display and Oswald**. Every
+entry has a bundled specimen image, so you can compare the actual lettering before
+downloading anything. Tap **Preview** for a larger sample, then **Download** to
+fetch the font at the current slot. The font is validated, stored in the app's
+private storage and applied immediately; it then appears in the **Key font** list.
+Installed fonts can be removed from the same screen, and removing the selected font
+falls back safely to the default. Downloading requires an internet connection; the
+rest of the keyboard stays fully offline.
 
 ### Key behaviour
 
@@ -156,6 +172,10 @@ layout, clipboard or keyboard height up/down.
 - **Vibrate on keypress** and **Vibrate duration**.
 - **Sound on keypress**, **Key sound** pack (mechanical packs, system tone or spoken
   letters) and **Key click volume**.
+- **Mute when device is muted** — on by default. Key clicks stay silent when the
+  phone is in silent/vibrate mode, an audio stream is muted, or media/system volume
+  is zero; the keyboard follows ring, volume and mute changes live. Turn it off only
+  if you want key clicks to ignore the device's mute state.
 - **Click volume control method**.
 - **Key preview popup** — the enlarged key shown while pressing.
 

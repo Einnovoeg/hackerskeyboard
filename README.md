@@ -28,11 +28,11 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
 **Looks**
 - **36 themes**, including modern dark/light/OLED, glass, wood, ocean, forest,
   nebula, carbon, the 3.0 palettes Lagoon, Ember, Cobalt, Blossom, Glacier and
-  Obsidian, plus six new 3.0.2 palettes: Orchid, Reef, Crimson, Arctic, Graphite and
-  Solar.
+  Obsidian, plus six additional palettes: Orchid, Reef, Crimson, Arctic, Graphite
+  and Solar.
 - **32 high-resolution background images**, including eight new 2160 × 4800
-  artworks in 3.0.2: Abyss, Solar corona, Orchid bloom, Brushed titanium, Reef
-  light, Volcanic fissures, Arctic ice and Mirage dunes.
+  artworks: Abyss, Solar corona, Orchid bloom, Brushed titanium, Reef light,
+  Volcanic fissures, Arctic ice and Mirage dunes.
 - **18 background animations**: matrix rain, starfield, aurora, scanlines, rain,
   bubbles, neon grid, fireflies, plasma, snow, vortex, ripples, light beams, liquid
   flow, constellation, lava lamp, tidal waves and meteor shower.
@@ -41,6 +41,9 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
 - Per-element styling: key glyph style, key cap style, key letter colour, font,
   corner radius, opacity, shadow depth, shadow softness, accent colour, hint colour
   and label scaling.
+- **Font library** with 13 downloadable Google Fonts — Space Mono, Bebas Neue,
+  Anton, Press Start 2P, VT323, Righteous, Russo One, Pacifico, Lobster, Audiowide,
+  Archivo Black, Playfair Display and Oswald — each previewed before download.
 - **Nine key-press effects** — Glow, Ripple, Neon edge, Spark burst, Rainbow flash,
   Scanline sweep, Starlight and Shockwave, plus None — with an optional accent
   colour independent of the theme.
@@ -56,8 +59,8 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
 - Gamepad panel that emits real controller key events, with Xbox/Switch/PlayStation
   glyph sets, its own theme and background, and side swapping.
 - Clipboard history, text snippets, macros and per-app theme rules.
-- Adjustable keyboard height (with pinch-to-resize), one-handed mode, key sounds and
-  haptics.
+- Adjustable keyboard height (with pinch-to-resize), one-handed mode, key sounds
+  (including a mute-when-device-muted guard) and haptics.
 - Full-text search across every setting.
 - Settings preview that shows the real keyboard as you change things.
 - A Konami code easter egg on the gamepad panel.
@@ -72,8 +75,7 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
 
 ### From a release (recommended)
 
-1. Download `hack3rs-keyboard-3.0.2.apk` from the [Releases](../../releases) page.
-   The earlier `hack3rs-keyboard-3.0.apk` remains available on the v3.0 release.
+1. Download `hack3rs-keyboard-3.0.apk` from the [Releases](../../releases) page.
 2. Install it (allow "install unknown apps" for your browser or file manager if
    asked).
 3. Open **HACK3RS K3YB0ARD 3.0** and follow the two setup buttons: enable the
@@ -133,12 +135,13 @@ Settings are now a grouped hub, searchable and previewed live:
   one-handed mode, label/suggestion scaling, fifth-row height, settings and voice
   keys.
 - **Keys & remapping** — per-layer key remapping, glyph/style/colour/font, bold,
-  tracking, hints, radius, opacity, shadow depth, shadow softness, key behaviour
-  and long-press controls.
+  tracking, hints, radius, opacity, shadow depth, shadow softness, the downloadable
+  font library, key behaviour and long-press controls.
 - **Typing & prediction** — input languages, suggestions, autocorrect strength,
   recorrection, terminal-safe mode and speech.
 - **Gesture and key actions** — swipe gestures and hardware volume keys.
-- **Sounds & haptics** — audio, vibration, sound packs and key preview popup.
+- **Sounds & haptics** — audio, vibration, sound packs, mute-when-device-muted
+  and key preview popup.
 - **Tools & gamepad** — clipboard history, text snippets, macros, per-app themes
   and gamepad appearance.
 - **Advanced** — render mode, input behaviour, touch diagnostics and version.
@@ -200,5 +203,4 @@ Bug reports, feature requests and pull requests are welcome. Please read
 [CONTRIBUTING](docs/CONTRIBUTING.md) first, keep changes focused, and test on a real
 device where you can.
 
-See [CHANGELOG.md](CHANGELOG.md) for the full 3.0 release notes, the 3.0.1
-key-remapping update and the 3.0.2 appearance/settings release.
+See [CHANGELOG.md](CHANGELOG.md) for the complete 3.0 release notes.

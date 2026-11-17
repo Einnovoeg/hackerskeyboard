@@ -10,6 +10,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -85,6 +87,26 @@ public class CatalogueConsistencyTest {
         assertEquals(8, countItems("key_glyph_values"));
         assertEquals(10, countItems("key_font_values"));
         assertEquals(16, countItems("key_text_color_values"));
+    }
+
+    @Test
+    public void downloadedFontCatalogueIsStable() {
+        assertEquals(13, DownloadedFonts.count());
+        Set<String> ids = new HashSet<>();
+        for (int i = 0; i < DownloadedFonts.count(); i++) {
+            DownloadedFonts.Font font = DownloadedFonts.get(i);
+            String slot = "slot " + i;
+            assertTrue(slot, font != null);
+            assertTrue(slot, font.id.matches("[a-z0-9]+"));
+            assertTrue(slot, ids.add(font.id));
+            assertTrue(slot, font.url.startsWith("https://raw.githubusercontent.com/google/fonts/"));
+            assertTrue(slot, font.previewRes != 0);
+            assertEquals(slot, DownloadedFonts.FIRST_INDEX + i, DownloadedFonts.indexOf(font));
+            assertEquals(slot, font.id, DownloadedFonts.forIndex(DownloadedFonts.FIRST_INDEX + i).id);
+        }
+        assertEquals(null, DownloadedFonts.forIndex(DownloadedFonts.FIRST_INDEX - 1));
+        assertEquals(null, DownloadedFonts.forIndex(
+                DownloadedFonts.FIRST_INDEX + DownloadedFonts.count()));
     }
 
     @Test

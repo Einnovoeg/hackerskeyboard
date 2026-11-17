@@ -1,209 +1,137 @@
 # Changelog
 
-All notable changes to HACK3RS K3YB0ARD are documented here. The format follows
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
-[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+All notable changes to HACK3RS K3YB0ARD are documented here. The project remains on
+version **3.0** until a new version is explicitly started.
 
-## [3.0.2] — 2026-11-17
+## [3.0] — 2026-11-17
 
-A look-and-customisation release: a larger high-resolution art and theme catalogue,
-new animated backgrounds with global timing controls, extra key-shaping options,
-and a settings menu rebuilt around grouped, navigable screens.
+The finished 3.0 build: a five-row PC-style Android keyboard with a clean Material
+look, a grouped and searchable settings hub, a much larger theme/background/effect
+catalogue, deeper key customisation, a downloadable font library, and reliable
+silent-mode handling for key sounds.
 
-### Added
-- **Six new themes** — Orchid, Reef, Crimson, Arctic, Graphite and Solar — with
-  matching layouts, key-cap states, colours and previews. The catalogue is now 36.
-- **Eight new 2160 × 4800 background artworks** — Abyss, Solar corona, Orchid
-  bloom, Brushed titanium, Reef light, Volcanic fissures, Arctic ice and Mirage
-  dunes. Backgrounds are bundled at device resolution; the catalogue is now 32.
-- **Three new background animations** — Lava lamp, Tidal waves and Meteor shower —
-  for 18 animated styles in total.
-- **Animation speed** (0.2×–3×) and **animation intensity** (10–100%) controls,
-  applied uniformly through the effect clock and composited layer.
-- **Accent colour** for key-press effects: follow the theme, electric blue, mint,
-  violet, amber, crimson, rose or monochrome.
-- **Key shadow softness** (0–16 dp), implemented as layered translucent shadows so
-  the setting has a visible effect on raised key caps.
+### Looks, themes and backgrounds
+- **36 themes**, including the original Gingerbread/ICS looks, Material
+  dark/light/OLED, glass, wood, ocean, forest, sunset, nebula, rose, sandstone,
+  midnight, aurora, cyberpunk, paper, carbon, Lagoon, Ember, Cobalt, Blossom,
+  Glacier, Obsidian, Orchid, Reef, Crimson, Arctic, Graphite and Solar. Each has a
+  matching layout, key states, borders, hints, panel colours and preview.
+- **32 high-resolution background images**, including eight 2160 × 4800 artworks:
+  Abyss, Solar corona, Orchid bloom, Brushed titanium, Reef light, Volcanic
+  fissures, Arctic ice and Mirage dunes. Art is bundled at device resolution.
+- **18 background animations** (plus None): Matrix rain, Starfield, Aurora,
+  Scanlines, Rain, Bubbles, Neon grid, Fireflies, Plasma, Snow, Vortex, Ripples,
+  Light beams, Liquid flow, Constellation, Lava lamp, Tidal waves and Meteor
+  shower.
+- **Animation speed** (0.2×–3×) and **intensity** (10–100%) apply to every
+  background effect through one shared virtual clock and a composited draw layer.
+- **Background dim**, per-key cap opacity, corner radius, shadow depth and shadow
+  softness (layered translucent shadows).
+- **Nine key-press effects** — Glow, Ripple, Neon edge, Spark burst, Rainbow flash,
+  Scanline sweep, Starlight, Shockwave, plus None — with an accent colour
+  independent of the theme.
+- **RGB lighting** — Rainbow, Breathing, Wave, Reactive press and Static colour
+  modes, with speed, base hue and brightness.
+- **Key appearance** — eight glyph styles, three cap styles, sixteen letter
+  colours, bold labels, letter-spacing control, alternate-key hint modes and
+  label/candidate scaling.
 
-### Changed
-- Rebuilt the settings into a clean hub with eight grouped screens: Theme &
+### Fonts and customisation
+- **Ten built-in typefaces** plus a **font library** of 13 downloadable Google
+  Fonts: Space Mono, Bebas Neue, Anton, Press Start 2P, VT323, Righteous, Russo
+  One, Pacifico, Lobster, Audiowide, Archivo Black, Playfair Display and Oswald.
+- Every downloadable font has a bundled specimen image, so the **preview is shown
+  before any download**. Font files are fetched only when chosen, validated by
+  Android's typeface parser, and stored in private app storage.
+- Downloaded fonts appear in the **Key font** list, apply live to key labels and
+  the key preview popup, and can be removed. Removing the selected font falls back
+  safely to the default.
+- **Vial-style per-layer key remapping** for every key on the full, compact,
+  standard and phone boards, including symbol layers. Keys can emit a character or
+  a named action: Shift, Backspace, Enter, Space, Tab, Escape, layer switch,
+  settings, emoji, clipboard, voice, next language, Ctrl, Alt, Meta, Fn, arrows,
+  Home, End, Page Up/Down, forward delete, close keyboard, macros and gamepad.
+- Per-key label and text-colour styling, current/original binding display,
+  per-layer overrides, individual reset and reset-all.
+- **Gamepad appearance** with its own theme, background, glyph set and left/right
+  swap; the panel emits real controller key events.
+
+### Settings and workflow
+- Rebuilt settings as a clean hub with **eight grouped screens**: Theme &
   background, Layout & sizing, Keys & remapping, Typing & prediction, Gesture and
-  key actions, Sounds & haptics, Tools & gamepad, and Advanced. Every control lives
-  on exactly one screen; the expanded full-text search opens the correct screen.
-- Moved key remapping, key shape, behaviour, prediction, speech and system input
-  options out of the old mixed appearance screen. Removed the duplicate background
-  preview and duplicate category headings.
-- Release version is now **3.0.2** (`versionCode 3000002`).
-
-### Verification
-- `:app:testDebugUnitTest` — 17 JVM tests, 0 failures, including updated catalogue
-  parity for 36 themes, 32 backgrounds and 18 effects.
-- `:app:assembleDebug` and `:app:assembleRelease` pass; release APK signed and
-  verified with `apksigner`.
-- On-device checks on a Motorola moto g 2025 (Android 16): the Orchid theme and
-  Abyss background rendered on the live keyboard; the Lava lamp animation moved
-  between captured frames; speed 2.6× and intensity 50% persisted across a process
-  restart; the blue accent and Glow press effect appeared on a touched key; all
-  grouped settings screens opened with their controls present.
-
-[3.0.2]: https://github.com/Einnovoeg/hackerskeyboard/releases/tag/v3.0.2
-
-## [3.0.1] — 2026-11-17
-
-A focused 3.0 update that turns **Customize keys** into a real per-layer key
-remapper and fixes the full-size symbols toggle.
-
-### Added
-- **Vial-style per-layer remapping** for every key on the full 5-row QWERTY,
-  AZERTY and Dvorak boards, the compact board, the standard board and the phone
-  board, including their symbol layers.
-- Each key can be bound to a single character or to a named action: Shift,
-  Backspace, Enter, Space, Tab, Escape, layer switch, settings, emoji, clipboard,
-  voice, next language, Ctrl, Alt, Meta, Fn, arrows, Home, End, Page Up/Down,
-  forward delete, close keyboard, macros and gamepad.
-- An in-keyboard emoji picker for the **Emoji** action.
-- The editor shows the current binding and the original binding for every key,
-  remembers the selected board/layer, and keeps optional label and text-colour
-  styling on top of a binding.
-- Per-key reset and reset-all confirmation. Invalid characters, unknown actions,
-  control characters and multi-character values are rejected in the editor with a
-  visible error instead of being written.
-- Old flat label/output/colour overrides are read as a legacy fallback.
-
-### Fixed
-- The Sym key and every layer-switch remap did nothing on full 5-row layouts
-  because the layout switcher always returned the letters board.
-- A mode-change tap could toggle in both `onPress` and `onKey`, immediately
-  switching back to the previous layer.
-- Added an **ABC** return key to the full symbols board so the symbols layer is no
-  longer a dead end.
-
-### Verification
-- `:app:testDebugUnitTest` and `:app:assembleDebug` pass (17 JVM tests).
-- On-device checks on a Motorola moto g 2025 (Android 16): a letter remapped to
-  another character typed the new character live; a letter remapped to Backspace
-  deleted text; a layer-switch remap opened the symbols board; a symbols-layer
-  remap typed only in symbols while letters stayed unchanged; overrides survived
-  process restart; reset-all cleared the live keyboard.
-
-[3.0.1]: https://github.com/Einnovoeg/hackerskeyboard/releases/tag/v3.0.1
-
-## [3.0] — 2026-11-15
-
-The largest release of the project: a complete visual refresh, a rebuilt settings
-experience, many more themes and backgrounds, new animation systems, and a gamepad
-panel with a hidden tribute.
-
-### Changed
-- Renamed and rebranded the app as **HACK3RS K3YB0ARD 3.0** in the launcher, input
-  method list, settings titles, setup/help text and about/version row.
-- Version bumped to `3.0` (`versionCode 3000000`).
-- Settings moved to a Material 3 interface with edge-to-edge insets, grouped
-  screens, plain-language section titles and summaries, and a persistent search
-  entry point.
-- Appearance settings are now a dedicated **Keyboard customization** screen with
-  live previews of the theme, background and key styling.
-- Feedback controls are grouped into **Typing aids** and **Sound, vibration and key
-  preview** sections instead of a flat list.
-- Key sizing, one-handed layout and background dimming now apply immediately to the
-  open keyboard rather than waiting for the next input session.
-
-### Added — themes and appearance
-- **30 themes** in total, including six new palettes: Lagoon, Ember, Cobalt,
-  Blossom, Glacier and Obsidian, each with matching keyboard layouts, colours and
-  preview backgrounds.
-- **24 high-resolution backgrounds**, including six new 2160 × 4800 artworks
-  (Lagoon light, Ember glow, Cobalt depths, Blossom haze, Glacier facets and
-  Obsidian gold).
-- **15 background animations**, including the new Ripples, Light beams, Liquid flow
-  and Constellation effects, alongside Matrix rain, Starfield, Aurora, Scanlines,
-  Rain, Bubbles, Neon grid, Fireflies, Plasma, Snow and Vortex.
-- Background dimming slider with live preview.
-- Key corner radius, cap opacity, shadow depth and height scaling.
-- Eight key glyph styles, three key cap styles, sixteen label colours, ten fonts,
-  bold labels, letter-spacing control, alternate-key hint modes and label/candidate
-  scaling.
-- Gamepad appearance controls with their own theme, background, glyph set and
-  left/right swap.
-- Nine selectable key-press effects: Glow, Ripple, Neon edge, Spark burst, Rainbow
-  flash, Scanline sweep, Starlight and Shockwave, plus None.
-- RGB keyboard lighting with Rainbow, Breathing, Wave, Reactive press and Static
-  colour modes, animation speed, base hue and brightness controls.
-- **Customize keys** editor for per-key labels, output text and text colours,
-  covering letters, numbers, symbols and modifiers, with individual and global
-  reset. (3.0.1 replaces the output-text field with real per-layer character and
-  action bindings.)
-
-### Added — input and workflow
-- Gamepad panel that emits real controller key events (`KEYCODE_BUTTON_*`,
-  `KEYCODE_DPAD_*`), with Xbox, Switch and PlayStation glyph sets and a live preview.
-- Konami-code easter egg on the gamepad: a CRT-to-synthwave Hackerman title card
-  with a synthesized 8-bit arpeggio, dismissible by tap and timed automatically.
-- Clipboard history, text snippets and macros, each with dedicated editors.
-- Per-app theme rules.
+  key actions, Sounds & haptics, Tools & gamepad, and Advanced.
+- Every control lives on exactly one screen; full-text search finds options by
+  name or keyword and opens the correct screen.
+- A live miniature of the real keyboard previews theme, background, font, shape,
+  effects and sizing changes as they happen.
+- **Mute when device is muted** (on by default) suppresses key clicks in
+  silent/vibrate mode, when an audio stream is muted, and when media or system
+  volume is zero. It follows ring, volume and mute changes live; spoken key
+  feedback is covered by the same guard.
 - Ten mechanical keyboard sound packs (Cherry MX Blue/Brown/Red/Black in ABS and
-  PBT, EG Crystal Purple, EG Oreo, Topre Purple Hybrid), plus the Android system
-  tone and a spoken-letters mode.
-- Full-text settings search covering every major option and keyword aliases.
-
-### Added — customization and tooling
-- Keyboard height and mode for portrait and landscape, one-handed mode, and
-  pinch-to-resize.
-- Configurable Ctrl+A behaviour, chording modifier keys, slide-key cursor movement,
-  long-press duration, popup/key preview toggles, terminal-safe autocorrect and
-  autocorrect strength.
-- Swipe gestures and hardware volume-key actions.
-- Renderer selection and touch-position debugging.
+  PBT, EG Crystal Purple, EG Oreo, Topre Purple Hybrid), the Android system tone
+  and a spoken-letters mode.
+- Clipboard history, text snippets, macros and per-app theme rules, each with a
+  dedicated editor.
+- Adjustable portrait/landscape height, one-handed left/right mode,
+  pinch-to-resize, swipe gestures and hardware volume-key actions.
+- Terminal-safe autocorrect, input languages, suggested punctuation,
+  recorrection, popup/key preview and TTS controls.
 
 ### Fixed
-- Background dimming was ignored by the settings preview because the stored decimal
-  was parsed as an integer.
-- The preview did not reflect key radius, opacity, shadow depth or height scaling.
-- Preview height scaling was overwritten by the fit-to-width scale.
+- The Sym key and layer-switch remaps did nothing on full five-row layouts.
+- A mode-change tap could toggle in both `onPress` and `onKey`, switching straight
+  back to the previous layer.
+- Added an **ABC** return key to the full symbols board so it is no longer a dead
+  end.
+- Background dimming used an integer parse and was ignored by the preview.
+- The preview did not reflect key radius, opacity, shadow depth or height scaling,
+  and height scaling was overwritten by the fit-to-width scale.
 - Live visual settings did not refresh the open keyboard until the next input
   session.
-- One-handed mode did not refresh while the keyboard was open and could crash when
-  no input view existed.
 - One-handed mode kept the keyboard at full width and clipped the rightmost keys;
-  it now narrows and scales the key grid so left and right modes both fit the
-  screen, including after theme changes and rotation.
-- Duplicate preference-category identifier in the main settings screen.
-- Duplicate sound/vibration controls appeared in both appearance and feedback
-  screens; they now live only in the feedback screen.
-- Removed an orphan debug preference screen and its unused preference constant.
-- Settings search results contained duplicate entries and omitted several newer
-  options.
+  it now narrows and scales the grid so left and right modes both fit.
+- Duplicate sound/vibration controls appeared in two screens; they now live only
+  under Sounds & haptics.
+- Removed an orphan debug preference screen and duplicate settings-search entries.
+- Key sounds could still play when the phone was muted through media/system volume
+  rather than the ringer; the new mute guard covers those states.
 
-### Security
-- No internet permission, analytics, ads or telemetry.
-- Clipboard history, snippets and macros stay in the app's private data directory.
+### Security and privacy
+- No analytics, ads or telemetry.
+- The only network use is the explicit, user-requested font download. The
+  `INTERNET` permission is not needed for typing, themes, backgrounds or previews.
+- Clipboard history, snippets, macros, per-app rules and downloaded fonts stay in
+  the app's private data directory.
 - Personal data, machine paths and build caches are excluded from the repository.
 
 ### Verification
-- `:app:testDebugUnitTest` — 12 JVM tests, 0 failures: tuning parsing/clamping,
-  catalogue counts, entry/value parity, press/RGB catalogue counts and drawable
-  index safety.
+- `:app:testDebugUnitTest` — 18 JVM tests, 0 failures: tuning parsing/clamping,
+  catalogue counts, entry/value parity, press/RGB catalogue counts, drawable index
+  safety and downloadable-font slot/URL checks.
 - `:app:assembleDebug` and `:app:assembleRelease` build successfully.
 - Release APK is signed and verified with `apksigner`.
-- On-device checks on a Motorola moto g 2025 (Android 16): installation, IME
-  activation, typing, settings search, theme/background/animation changes,
-  key-press effects, RGB modes (including reactive press), per-key label/output/
-  colour overrides, one-handed left/right modes and rotation, with no crashes or
-  ANRs.
+- On-device checks on a Motorola moto g 2025 (Android 16): installation and IME
+  activation, grouped settings screens, Orchid theme with Abyss background on the
+  live keyboard, Lava lamp animation between frames, 2.6× speed/50% intensity
+  persistence across restart, blue accent and Glow press effect, and visibly
+  different raised-key shadows at 0 and 16 dp.
 
 ### Known limitations
 - Gesture typing is not implemented.
 - Bundled dictionaries and next-word prediction are basic.
-- Some translations do not cover the new 3.0 settings.
-- The gamepad panel sends key events; a few games that read the physical controller
-  API will not detect it.
-- Hardware verification was performed manually on a Motorola moto g 2025 running
-  Android 16; wider device coverage and accessibility improvements are still wanted.
+- Some translations do not cover the newer settings.
+- Font downloads require an internet connection; the previews and the rest of the
+  keyboard work offline.
+- The gamepad panel sends key events; games that read the physical controller API
+  will not detect it.
+- Wider device coverage and accessibility improvements are still wanted.
 
 ### Upgrade notes
-- The package name remains `org.pocketworkstation.pckeyboard`, so existing settings
-  and dictionaries are preserved when upgrading with the same signing key.
-- This release is signed with a new release key. If you previously installed a
-  debug build, uninstall it first or install the new APK after removing the old one.
+- The package name remains `org.pocketworkstation.pckeyboard`, so settings and
+  dictionaries are preserved when upgrading with the same signing key.
+- This release is signed with the project's release key. If a debug build was
+  installed previously, uninstall it first or install the release APK with the
+  debug package removed.
 
 [3.0]: https://github.com/Einnovoeg/hackerskeyboard/releases/tag/v3.0

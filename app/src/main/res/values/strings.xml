@@ -828,6 +828,25 @@
     </string-array>
 
     <string name="title_key_font">Key font</string>
+    <string name="title_font_library">Font library</string>
+    <string name="summary_font_library">Preview and download 13 extra typefaces</string>
+    <string name="font_library_intro">Preview each typeface below, then download it to use on your keys. Every preview is included with the app; font files only download when you choose them.</string>
+    <string name="font_library_license_footer">Typefaces from Google Fonts, licensed under the SIL Open Font License 1.1. Downloaded fonts are stored only on this device.</string>
+    <string name="font_preview">Preview</string>
+    <string name="font_preview_description">Preview of %1$s</string>
+    <string name="font_preview_download_hint">This is the actual typeface. Download it to use it on the keyboard.</string>
+    <string name="font_preview_installed_hint">Downloaded and ready. Apply it to the keyboard, or remove it from this device.</string>
+    <string name="font_preview_selected_hint">This typeface is currently used for key labels.</string>
+    <string name="font_download">Download</string>
+    <string name="font_downloading">Downloading…</string>
+    <string name="font_download_failed">Download failed. Check your connection and try again.</string>
+    <string name="font_use">Use font</string>
+    <string name="font_selected">Selected</string>
+    <string name="font_applied">%1$s applied to the keyboard</string>
+    <string name="font_remove">Remove</string>
+    <string name="font_remove_title">Remove %1$s?</string>
+    <string name="font_remove_message">The downloaded font will be deleted from this device. Your keys switch back to the default font if this one is in use.</string>
+    <string name="font_removed">Font removed</string>
     <string name="default_key_font">0</string>
     <string-array name="key_font_entries">
         <item>Default (Roboto)</item>
@@ -1295,6 +1314,9 @@
     <string name="summary_background_dim">Darkens the animated background so keys stay readable</string>
     <string name="title_sound_on">Key sounds</string>
     <string name="summary_sound_on">Play a click or spoken letter on each key</string>
+    <string name="title_mute_when_muted">Mute when device is muted</string>
+    <string name="summary_mute_when_muted_on">Silences key clicks in silent mode or at zero volume</string>
+    <string name="summary_mute_when_muted_off">Keeps key clicks audible even when the phone is muted</string>
     <string name="title_vibrate_on">Haptics</string>
     <string name="summary_vibrate_on">Vibrate on each key press</string>
 
