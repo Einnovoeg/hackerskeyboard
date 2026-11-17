@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Advanced: input-mode behaviour, rendering and diagnostics. -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="prefs_advanced"
+    android:title="@string/pref_screen_advanced_title">
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_advanced_input"
+        android:title="@string/settings_group_input">
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@bool/default_fullscreen_override"
+            android:key="fullscreen_override"
+            android:persistent="true"
+            android:summaryOff="@string/summary_fullscreen_override_false"
+            android:summaryOn="@string/summary_fullscreen_override_true"
+            android:title="@string/title_fullscreen_override" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@bool/default_force_keyboard_on"
+            android:key="force_keyboard_on"
+            android:persistent="true"
+            android:summaryOff="@string/summary_force_keyboard_on_false"
+            android:summaryOn="@string/summary_force_keyboard_on_true"
+            android:title="@string/title_force_keyboard_on" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@bool/default_keyboard_notification"
+            android:key="keyboard_notification"
+            android:persistent="true"
+            android:summaryOff="@string/summary_keyboard_notification_false"
+            android:summaryOn="@string/summary_keyboard_notification_true"
+            android:title="@string/title_keyboard_notification" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="true"
+            android:icon="@drawable/ic_hk_terminal"
+            android:key="connectbot_tab_hack"
+            android:persistent="true"
+            android:summaryOff="@string/summary_connectbot_tab_hack_false"
+            android:summaryOn="@string/summary_connectbot_tab_hack_true"
+            android:title="@string/title_connectbot_tab_hack" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_advanced_render"
+        android:title="@string/settings_group_advanced">
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_render_mode"
+            android:entries="@array/render_mode_entries"
+            android:entryValues="@array/render_mode_values"
+            android:icon="@drawable/ic_hk_render"
+            android:key="pref_render_mode"
+            android:persistent="true"
+            android:title="@string/title_render_mode" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="false"
+            android:icon="@drawable/ic_hk_render"
+            android:key="pref_touch_pos"
+            android:persistent="true"
+            android:summaryOff="@string/summary_touch_pos_false"
+            android:summaryOn="@string/summary_touch_pos_true"
+            android:title="@string/title_touch_pos" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_advanced_diagnostics"
+        android:title="@string/title_debugging">
+
+        <Preference android:layout="@layout/preference_hk"
+            android:key="input_connection_info"
+            android:title="@string/title_input_connection_details" />
+
+        <Preference android:layout="@layout/preference_hk"
+            android:key="label_version"
+            android:summary="@string/auto_version"
+            android:title="@string/title_version" />
+    </PreferenceCategory>
+</PreferenceScreen>

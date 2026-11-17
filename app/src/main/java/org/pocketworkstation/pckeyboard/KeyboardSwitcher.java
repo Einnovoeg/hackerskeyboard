@@ -92,6 +92,12 @@ public class KeyboardSwitcher implements
         R.layout.input_blossom,
         R.layout.input_glacier,
         R.layout.input_obsidian,
+        R.layout.input_orchid,
+        R.layout.input_reef,
+        R.layout.input_crimson,
+        R.layout.input_arctic,
+        R.layout.input_graphite,
+        R.layout.input_solar,
     };
 
     // Tables which contains resource ids for each character theme color

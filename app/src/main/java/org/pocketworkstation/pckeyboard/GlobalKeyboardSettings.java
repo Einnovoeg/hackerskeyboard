@@ -57,6 +57,9 @@ public final class GlobalKeyboardSettings {
     public int keyTextColor = 0;
     public int keyGlyphs = 0;
     public int keyEffect = 0;
+    public float keyEffectSpeed = 1.0f;
+    public float keyEffectIntensity = 0.85f;
+    public int keyAccent = 0;
     public int keyPressEffect = 0;
     public int keyRgbMode = RGB_OFF;
     public float keyRgbSpeed = 1.0f;
@@ -282,6 +285,35 @@ public final class GlobalKeyboardSettings {
         addStringPref("pref_key_effect", new StringPref() {
             public void set(String val) { keyEffect = Integer.valueOf(val); }
             public String getDefault() { return res.getString(R.string.default_key_effect); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_effect_speed", new StringPref() {
+            public void set(String val) {
+                try { keyEffectSpeed = Float.parseFloat(val); }
+                catch (RuntimeException e) { keyEffectSpeed = 1.0f; }
+                keyEffectSpeed = Math.max(0.2f, Math.min(3.0f, keyEffectSpeed));
+            }
+            public String getDefault() { return res.getString(R.string.default_background_animation_speed); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_effect_intensity", new StringPref() {
+            public void set(String val) {
+                try { keyEffectIntensity = Float.parseFloat(val) / 100f; }
+                catch (RuntimeException e) { keyEffectIntensity = 0.85f; }
+                keyEffectIntensity = Math.max(0.1f, Math.min(1.0f, keyEffectIntensity));
+            }
+            public String getDefault() { return res.getString(R.string.default_background_animation_intensity); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_accent", new StringPref() {
+            public void set(String val) {
+                try { keyAccent = Integer.parseInt(val); }
+                catch (RuntimeException e) { keyAccent = 0; }
+            }
+            public String getDefault() { return res.getString(R.string.default_key_accent); }
             public int getFlags() { return FLAG_PREF_NONE; }
         });
 

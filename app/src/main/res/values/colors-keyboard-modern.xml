@@ -264,4 +264,69 @@
     <color name="kb_obsidian_key_stroke">#2C2C31</color>
     <color name="kb_obsidian_key_pressed_stroke">#3A3A40</color>
     <color name="kb_obsidian_key_active_stroke">#C9A24A</color>
+    <!-- Orchid -->
+    <color name="kb_orchid_panel">#160E21</color>
+    <color name="kb_orchid_key">#281936</color>
+    <color name="kb_orchid_key_pressed">#3A2450</color>
+    <color name="kb_orchid_key_active">#8E5BD9</color>
+    <color name="kb_orchid_key_text">#F7EEFF</color>
+    <color name="kb_orchid_key_hint">#B9A6D6</color>
+    <color name="kb_orchid_key_stroke">#412D59</color>
+    <color name="kb_orchid_key_pressed_stroke">#584070</color>
+    <color name="kb_orchid_key_active_stroke">#C39BFF</color>
+
+    <!-- Reef -->
+    <color name="kb_reef_panel">#041A1C</color>
+    <color name="kb_reef_key">#0B3033</color>
+    <color name="kb_reef_key_pressed">#124649</color>
+    <color name="kb_reef_key_active">#1F7C75</color>
+    <color name="kb_reef_key_text">#E8FFFB</color>
+    <color name="kb_reef_key_hint">#7EBAB3</color>
+    <color name="kb_reef_key_stroke">#1C4A4B</color>
+    <color name="kb_reef_key_pressed_stroke">#286361</color>
+    <color name="kb_reef_key_active_stroke">#48C7BB</color>
+
+    <!-- Crimson -->
+    <color name="kb_crimson_panel">#190609</color>
+    <color name="kb_crimson_key">#331015</color>
+    <color name="kb_crimson_key_pressed">#491A21</color>
+    <color name="kb_crimson_key_active">#992D3E</color>
+    <color name="kb_crimson_key_text">#FFF0F2</color>
+    <color name="kb_crimson_key_hint">#C99AA2</color>
+    <color name="kb_crimson_key_stroke">#4A2027</color>
+    <color name="kb_crimson_key_pressed_stroke">#63303A</color>
+    <color name="kb_crimson_key_active_stroke">#C54A5C</color>
+
+    <!-- Arctic -->
+    <color name="kb_arctic_panel">#EDF6FA</color>
+    <color name="kb_arctic_key">#FFFFFF</color>
+    <color name="kb_arctic_key_pressed">#D8EAF2</color>
+    <color name="kb_arctic_key_active">#B9E0F0</color>
+    <color name="kb_arctic_key_text">#102B36</color>
+    <color name="kb_arctic_key_hint">#5C7D8B</color>
+    <color name="kb_arctic_key_stroke">#C7DCE6</color>
+    <color name="kb_arctic_key_pressed_stroke">#AFCAD8</color>
+    <color name="kb_arctic_key_active_stroke">#7CB8D2</color>
+
+    <!-- Graphite -->
+    <color name="kb_graphite_panel">#111114</color>
+    <color name="kb_graphite_key">#222226</color>
+    <color name="kb_graphite_key_pressed">#303036</color>
+    <color name="kb_graphite_key_active">#4C4C55</color>
+    <color name="kb_graphite_key_text">#F4F4F6</color>
+    <color name="kb_graphite_key_hint">#A0A0AA</color>
+    <color name="kb_graphite_key_stroke">#34343A</color>
+    <color name="kb_graphite_key_pressed_stroke">#47474F</color>
+    <color name="kb_graphite_key_active_stroke">#8E8E9A</color>
+
+    <!-- Solar -->
+    <color name="kb_solar_panel">#1A0F04</color>
+    <color name="kb_solar_key">#372208</color>
+    <color name="kb_solar_key_pressed">#523311</color>
+    <color name="kb_solar_key_active">#C97813</color>
+    <color name="kb_solar_key_text">#FFF4DC</color>
+    <color name="kb_solar_key_hint">#CDA96E</color>
+    <color name="kb_solar_key_stroke">#523513</color>
+    <color name="kb_solar_key_pressed_stroke">#6E4A1C</color>
+    <color name="kb_solar_key_active_stroke">#F0A232</color>
 </resources>

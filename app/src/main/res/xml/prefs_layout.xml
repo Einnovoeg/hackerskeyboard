@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Layout and sizing: keyboard shape, rows, scale and chrome. -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:hk="http://schemas.android.com/apk/res-auto"
+    android:key="prefs_layout"
+    android:title="@string/pref_screen_layout_title">
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_layout_shape"
+        android:title="@string/settings_group_layout">
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_keyboard_mode_portrait"
+            android:entries="@array/keyboard_mode_entries"
+            android:entryValues="@array/keyboard_mode_values"
+            android:icon="@drawable/ic_hk_size"
+            android:key="pref_keyboard_mode_portrait"
+            android:persistent="true"
+            android:title="@string/title_keyboard_mode_portrait" />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_keyboard_mode_landscape"
+            android:entries="@array/keyboard_mode_entries"
+            android:entryValues="@array/keyboard_mode_values"
+            android:icon="@drawable/ic_hk_size"
+            android:key="pref_keyboard_mode_landscape"
+            android:persistent="true"
+            android:title="@string/title_keyboard_mode_landscape" />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_key_layout"
+            android:entries="@array/key_layout_entries"
+            android:entryValues="@array/key_layout_values"
+            android:icon="@drawable/ic_hk_glyph"
+            android:key="pref_key_layout"
+            android:persistent="true"
+            android:title="@string/title_key_layout" />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_one_handed"
+            android:entries="@array/one_handed_entries"
+            android:entryValues="@array/one_handed_values"
+            android:icon="@drawable/ic_hk_onehand"
+            android:key="pref_one_handed"
+            android:persistent="true"
+            android:title="@string/title_one_handed" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@bool/default_suggestions_in_landscape"
+            android:icon="@drawable/ic_hk_preview"
+            android:key="suggestions_in_landscape"
+            android:persistent="true"
+            android:summaryOff="@string/summary_suggestions_in_landscape_false"
+            android:summaryOn="@string/summary_suggestions_in_landscape_true"
+            android:title="@string/title_suggestions_in_landscape" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_layout_scale"
+        android:title="@string/settings_group_dimensions">
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_height_portrait"
+            hk:displayFormat="%.0f%%"
+            hk:maxValue="75"
+            hk:minValue="15"
+            hk:step="1"
+            android:icon="@drawable/ic_hk_size"
+            android:key="settings_height_portrait"
+            android:persistent="true"
+            android:title="@string/title_keyboard_height_portrait" />
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_height_landscape"
+            hk:displayFormat="%.0f%%"
+            hk:maxValue="75"
+            hk:minValue="15"
+            hk:step="1"
+            android:icon="@drawable/ic_hk_size"
+            android:key="settings_height_landscape"
+            android:persistent="true"
+            android:title="@string/title_keyboard_height_landscape" />
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="1.0"
+            hk:asPercent="true"
+            hk:maxValue="1.5"
+            hk:minValue="0.7"
+            hk:step="0.05"
+            android:icon="@drawable/ic_hk_size"
+            android:key="pref_key_height_scale"
+            android:persistent="true"
+            android:title="@string/title_key_height_scale" />
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="1.0"
+            hk:asPercent="true"
+            hk:maxValue="1.0"
+            hk:minValue="0.5"
+            hk:step="0.05"
+            android:icon="@drawable/ic_hk_size"
+            android:key="pref_top_row_scale"
+            android:persistent="true"
+            android:title="@string/title_top_row_scale" />
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="1.0"
+            hk:asPercent="true"
+            hk:logScale="true"
+            hk:maxValue="2.0"
+            hk:minValue="0.5"
+            android:icon="@drawable/ic_hk_size"
+            android:key="pref_label_scale_v2"
+            android:persistent="true"
+            android:title="@string/title_label_scale" />
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="1.0"
+            hk:asPercent="true"
+            hk:logScale="true"
+            hk:maxValue="8.0"
+            hk:minValue="0.5"
+            android:icon="@drawable/ic_hk_size"
+            android:key="pref_candidate_scale"
+            android:persistent="true"
+            android:title="@string/title_candidate_scale" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_layout_chrome"
+        android:title="@string/settings_group_input">
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/settings_key_mode_auto"
+            android:entries="@array/settings_key_modes"
+            android:entryValues="@array/settings_key_modes_values"
+            android:icon="@drawable/ic_hk_style"
+            android:key="settings_key"
+            android:persistent="true"
+            android:title="@string/prefs_settings_key" />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/voice_mode_symbols"
+            android:entries="@array/voice_input_modes"
+            android:entryValues="@array/voice_input_modes_values"
+            android:icon="@drawable/ic_hk_speak"
+            android:key="voice_mode"
+            android:persistent="true"
+            android:title="@string/voice_input" />
+    </PreferenceCategory>
+</PreferenceScreen>

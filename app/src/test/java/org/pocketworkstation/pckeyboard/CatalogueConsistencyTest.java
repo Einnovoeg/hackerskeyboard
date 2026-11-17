@@ -48,10 +48,10 @@ public class CatalogueConsistencyTest {
 
     @Test
     public void effectCatalogueMatchesRenderer() {
-        assertEquals(16, countItems("key_effect_values"));
-        assertEquals(16, countItems("key_effect_entries"));
-        // 0 = none plus fifteen animated effects, see LatinKeyboardBaseView.
-        assertEquals(15, LatinKeyboardBaseView.EFFECT_CONSTELLATION);
+        assertEquals(19, countItems("key_effect_values"));
+        assertEquals(19, countItems("key_effect_entries"));
+        // 0 = none plus eighteen animated effects, see LatinKeyboardBaseView.
+        assertEquals(18, LatinKeyboardBaseView.EFFECT_METEORS);
     }
 
     @Test
@@ -67,14 +67,14 @@ public class CatalogueConsistencyTest {
     public void backgroundCatalogueMatchesDrawables() {
         assertEquals(BackgroundImages.DRAWABLES.length, countItems("background_image_values"));
         assertEquals(BackgroundImages.DRAWABLES.length, countItems("background_image_entries"));
-        assertEquals(25, BackgroundImages.DRAWABLES.length);
+        assertEquals(33, BackgroundImages.DRAWABLES.length);
     }
 
     @Test
     public void themeCataloguesMatchRenderer() {
         assertEquals(KeyboardSwitcher.THEMES.length, countItems("keyboard_layout_modes_values"));
         assertEquals(KeyboardSwitcher.THEMES.length, countItems("keyboard_layout_modes"));
-        assertEquals(30, KeyboardSwitcher.THEMES.length);
+        assertEquals(36, KeyboardSwitcher.THEMES.length);
         // Gamepad theme values include the "Follow keyboard" (-1) entry.
         assertEquals(KeyboardSwitcher.THEMES.length + 1, countItems("gamepad_theme_values"));
     }

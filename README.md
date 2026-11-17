@@ -26,18 +26,24 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
 - Compact and phone layouts for smaller screens and landscape use.
 
 **Looks**
-- **30 themes**, including modern dark/light/OLED, glass, wood, ocean, forest,
-  nebula, carbon, and six new palettes: Lagoon, Ember, Cobalt, Blossom, Glacier and
-  Obsidian.
-- **24 high-resolution background images** (2160 × 4800 art, drawn as gradients and
-  vector-style compositions so they stay sharp at 1080 × 2400 and above).
-- **15 background animations**: matrix rain, starfield, aurora, scanlines, rain,
+- **36 themes**, including modern dark/light/OLED, glass, wood, ocean, forest,
+  nebula, carbon, the 3.0 palettes Lagoon, Ember, Cobalt, Blossom, Glacier and
+  Obsidian, plus six new 3.0.2 palettes: Orchid, Reef, Crimson, Arctic, Graphite and
+  Solar.
+- **32 high-resolution background images**, including eight new 2160 × 4800
+  artworks in 3.0.2: Abyss, Solar corona, Orchid bloom, Brushed titanium, Reef
+  light, Volcanic fissures, Arctic ice and Mirage dunes.
+- **18 background animations**: matrix rain, starfield, aurora, scanlines, rain,
   bubbles, neon grid, fireflies, plasma, snow, vortex, ripples, light beams, liquid
-  flow and constellation.
+  flow, constellation, lava lamp, tidal waves and meteor shower.
+- **Animation speed (0.2×–3×) and intensity (10–100%)** apply to every background
+  effect, not just one style.
 - Per-element styling: key glyph style, key cap style, key letter colour, font,
-  corner radius, opacity, shadow depth, hint colour and label scaling.
+  corner radius, opacity, shadow depth, shadow softness, accent colour, hint colour
+  and label scaling.
 - **Nine key-press effects** — Glow, Ripple, Neon edge, Spark burst, Rainbow flash,
-  Scanline sweep, Starlight and Shockwave, plus None.
+  Scanline sweep, Starlight and Shockwave, plus None — with an optional accent
+  colour independent of the theme.
 - **RGB keyboard lighting** — Rainbow, Breathing, Wave, Reactive press and Static
   colour modes, with speed, base hue and brightness controls.
 - **Vial-style per-layer key remapping** — give any key on any board a different
@@ -58,7 +64,7 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
 
 ## Screenshots
 
-| Keyboard | 24 background images | Hackerman easter egg |
+| Keyboard | 32 background images | Hackerman easter egg |
 | --- | --- | --- |
 | ![Keyboard](docs/screenshots/keyboard.png) | ![Backgrounds](docs/screenshots/backgrounds.png) | ![Hackerman](docs/screenshots/hackerman.png) |
 
@@ -66,7 +72,7 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
 
 ### From a release (recommended)
 
-1. Download `hack3rs-keyboard-3.0.1.apk` from the [Releases](../../releases) page.
+1. Download `hack3rs-keyboard-3.0.2.apk` from the [Releases](../../releases) page.
    The earlier `hack3rs-keyboard-3.0.apk` remains available on the v3.0 release.
 2. Install it (allow "install unknown apps" for your browser or file manager if
    asked).
@@ -119,24 +125,26 @@ Full documentation of every setting lives in the [settings guide](docs/SETTINGS.
 
 ## Settings overview
 
-Settings are grouped, searchable and preview live:
+Settings are now a grouped hub, searchable and previewed live:
 
-- **Keyboard view settings** — height and mode for portrait/landscape, suggestion
-  bar behaviour.
-- **Key layout options** — show the settings key, voice input, input languages.
-- **Key behaviour** — auto-capitalisation, auto-correct, double-space period,
-  chording, long-press behaviour.
-- **Keyboard customization** — theme, key glyphs/style/colour/font, 24 background
-  images, 15 animations, key-press effects, RGB lighting, per-layer key
-  remapping, dimming, key radius, opacity, shadow, scaling, one-handed mode and
-  gamepad appearance.
-- **Input and feedback** — key sounds, haptics and spoken feedback.
-- **Gamepad** — glyph set, pad theme, pad background, swap sides, live preview.
-- **Tools** — clipboard history, text snippets, macros, per-app themes.
-- **Advanced** — render mode, debugging options.
+- **Theme & background** — 36 themes, 32 background images, 18 animations with
+  speed and intensity, dimming, key-press effects, accent colour and RGB lighting.
+- **Layout & sizing** — portrait/landscape modes and heights, QWERTY/AZERTY/Dvorak,
+  one-handed mode, label/suggestion scaling, fifth-row height, settings and voice
+  keys.
+- **Keys & remapping** — per-layer key remapping, glyph/style/colour/font, bold,
+  tracking, hints, radius, opacity, shadow depth, shadow softness, key behaviour
+  and long-press controls.
+- **Typing & prediction** — input languages, suggestions, autocorrect strength,
+  recorrection, terminal-safe mode and speech.
+- **Gesture and key actions** — swipe gestures and hardware volume keys.
+- **Sounds & haptics** — audio, vibration, sound packs and key preview popup.
+- **Tools & gamepad** — clipboard history, text snippets, macros, per-app themes
+  and gamepad appearance.
+- **Advanced** — render mode, input behaviour, touch diagnostics and version.
 
 Each entry has a one-line description; the search box at the top finds any of them
-by name or by keyword (`oled`, `dvorak`, `lagoon`, `confetti`, …).
+by name or by keyword (`oled`, `dvorak`, `orchid`, `tidal`, `accent`, …).
 
 ## Known limitations and work needed
 
@@ -192,5 +200,5 @@ Bug reports, feature requests and pull requests are welcome. Please read
 [CONTRIBUTING](docs/CONTRIBUTING.md) first, keep changes focused, and test on a real
 device where you can.
 
-See [CHANGELOG.md](CHANGELOG.md) for the full 3.0 release notes and the 3.0.1
-key-remapping update.
+See [CHANGELOG.md](CHANGELOG.md) for the full 3.0 release notes, the 3.0.1
+key-remapping update and the 3.0.2 appearance/settings release.

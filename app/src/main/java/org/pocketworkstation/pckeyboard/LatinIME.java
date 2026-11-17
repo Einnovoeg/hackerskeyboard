@@ -3535,7 +3535,9 @@ public class LatinIME extends InputMethodService implements
     private static final java.util.Set<String> VISUAL_PREFS = new java.util.HashSet<>(
             java.util.Arrays.asList(
                     "pref_key_height_scale", "pref_key_radius", "pref_background_dim",
-                    "pref_key_opacity", "pref_key_shadow", "pref_key_effect",
+                    "pref_key_opacity", "pref_key_shadow", "pref_key_shadow_blur",
+                    "pref_key_effect", "pref_key_effect_speed", "pref_key_effect_intensity",
+                    "pref_key_accent",
                     "pref_key_press_effect", "pref_key_rgb_mode", "pref_key_rgb_speed",
                     "pref_key_rgb_hue", "pref_key_rgb_brightness",
                     BackgroundImages.PREF, "pref_key_style", "pref_key_font",
@@ -3557,6 +3559,21 @@ public class LatinIME extends InputMethodService implements
         view.applyCustomization(tuning.heightScale, tuning.radiusDp, tuning.backgroundDim);
         view.applyKeyOpacity(tuning.keyOpacity);
         view.applyKeyShadow(tuning.keyShadow);
+        float shadowBlur = 0f;
+        try {
+            shadowBlur = Float.parseFloat(prefs.getString("pref_key_shadow_blur", "0"));
+        } catch (RuntimeException ignored) {
+        }
+        view.applyKeyShadowBlur(shadowBlur);
+        float effectSpeed = 1f;
+        float effectIntensity = 0.85f;
+        try {
+            effectSpeed = Float.parseFloat(prefs.getString("pref_key_effect_speed", "1.0"));
+            effectIntensity = Float.parseFloat(
+                    prefs.getString("pref_key_effect_intensity", "85")) / 100f;
+        } catch (RuntimeException ignored) {
+        }
+        view.applyBackgroundEffect(effectSpeed, effectIntensity);
         int backgroundIndex = BackgroundImages.selected(this);
         int backgroundRes = BackgroundImages.drawableFor(backgroundIndex);
         view.applyBackgroundImage(backgroundRes == 0 ? null

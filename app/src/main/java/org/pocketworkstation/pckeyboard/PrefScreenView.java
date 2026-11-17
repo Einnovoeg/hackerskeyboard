@@ -16,11 +16,9 @@
 
 package org.pocketworkstation.pckeyboard;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.preference.ListPreference;
-import androidx.preference.PreferenceScreen;
 
+/** Theme, background art, background animation and lighting. */
 public class PrefScreenView extends BasePreferenceActivity {
 
     @Override
@@ -29,29 +27,9 @@ public class PrefScreenView extends BasePreferenceActivity {
     }
 
     public static class ViewFragment extends PrefScreenActions.BackupAwareFragment {
-        private ListPreference mRenderModePreference;
-
         @Override
         protected int getPreferencesResource() {
             return R.xml.prefs_view;
-        }
-
-        @Override
-        protected void onPreferencesReady(@Nullable PreferenceScreen screen) {
-            if (screen == null) return;
-            mRenderModePreference = screen.findPreference(LatinIME.PREF_RENDER_MODE);
-            linkToActivity(screen, "pref_clipboard_history", ClipboardHistoryActivity.class);
-            linkToActivity(screen, "pref_snippets", SnippetsActivity.class);
-            linkToActivity(screen, "pref_macros", MacrosActivity.class);
-        }
-
-        @Override
-        public void onResume() {
-            super.onResume();
-            if (LatinKeyboardBaseView.sSetRenderMode == null && mRenderModePreference != null) {
-                mRenderModePreference.setEnabled(false);
-                mRenderModePreference.setSummary(R.string.render_mode_unavailable);
-            }
         }
     }
 }

@@ -72,6 +72,26 @@
                 android:exported="false"
                 android:label="@string/pref_screen_feedback_title" />
 
+        <activity android:name="PrefScreenLayout"
+                android:exported="false"
+                android:label="@string/pref_screen_layout_title" />
+
+        <activity android:name="PrefScreenKeys"
+                android:exported="false"
+                android:label="@string/pref_screen_keys_title" />
+
+        <activity android:name="PrefScreenTyping"
+                android:exported="false"
+                android:label="@string/pref_screen_typing_title" />
+
+        <activity android:name="PrefScreenTools"
+                android:exported="false"
+                android:label="@string/pref_screen_tools_title" />
+
+        <activity android:name="PrefScreenAdvanced"
+                android:exported="false"
+                android:label="@string/pref_screen_advanced_title" />
+
         <activity android:name="SearchSettingsActivity"
                 android:exported="false"
                 android:label="@string/title_search_settings" 

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Typing: languages, prediction, correction and speech. -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:hk="http://schemas.android.com/apk/res-auto"
+    android:key="prefs_typing"
+    android:title="@string/pref_screen_typing_title">
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_typing_language"
+        android:title="@string/settings_group_language">
+
+        <Preference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_glyph"
+            android:key="pref_screen_language"
+            android:persistent="false"
+            android:summary="@string/language_selection_summary"
+            android:title="@string/language_selection_title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_typing_prediction"
+        android:title="@string/settings_group_typing">
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@bool/default_quick_fixes"
+            android:key="quick_fixes"
+            android:persistent="true"
+            android:summary="@string/quick_fixes_summary"
+            android:title="@string/quick_fixes" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@bool/default_suggestions"
+            android:key="show_suggestions"
+            android:persistent="true"
+            android:summary="@string/show_suggestions_summary"
+            android:title="@string/show_suggestions" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@bool/enable_autocorrect"
+            android:dependency="show_suggestions"
+            android:key="auto_complete"
+            android:persistent="true"
+            android:summary="@string/auto_complete_summary"
+            android:title="@string/auto_complete" />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_autocorrect_strength"
+            android:entries="@array/autocorrect_strength_entries"
+            android:entryValues="@array/autocorrect_strength_values"
+            android:icon="@drawable/ic_hk_autocorrect"
+            android:key="pref_autocorrect_strength"
+            android:persistent="true"
+            android:title="@string/title_autocorrect_strength" />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryEditTextPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/suggested_punctuations"
+            android:key="pref_suggested_punctuation"
+            android:title="@string/title_suggested_punctuation" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@bool/default_recorrection_enabled"
+            android:key="recorrection_enabled"
+            android:persistent="true"
+            android:summary="@string/prefs_enable_recorrection_summary"
+            android:title="@string/prefs_enable_recorrection" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="true"
+            android:icon="@drawable/ic_hk_terminal"
+            android:key="pref_terminal_safe"
+            android:persistent="true"
+            android:summary="@string/summary_terminal_safe"
+            android:title="@string/title_terminal_safe" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_typing_speech"
+        android:title="@string/settings_group_speech">
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="false"
+            android:icon="@drawable/ic_hk_speak"
+            android:key="pref_speak_keys"
+            android:persistent="true"
+            android:summary="@string/summary_speak_keys"
+            android:title="@string/title_speak_keys" />
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="1.0"
+            hk:asPercent="true"
+            hk:maxValue="1"
+            hk:minValue="0"
+            android:icon="@drawable/ic_hk_speak"
+            android:key="pref_speak_volume"
+            android:persistent="true"
+            android:summary="@string/summary_speak_volume"
+            android:title="@string/title_speak_volume" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="false"
+            android:icon="@drawable/ic_hk_speak"
+            android:key="pref_speak_words"
+            android:persistent="true"
+            android:summary="@string/summary_speak_words"
+            android:title="@string/title_speak_words" />
+
+        <Preference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_speak"
+            android:key="pref_voice_settings"
+            android:persistent="false"
+            android:summary="@string/summary_voice_settings"
+            android:title="@string/title_voice_settings" />
+    </PreferenceCategory>
+</PreferenceScreen>

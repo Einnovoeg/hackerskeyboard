@@ -48,7 +48,8 @@ public class KeyboardPreview extends FrameLayout {
         // Refresh the shared settings the keyboard renderer reads, from the same prefs.
         Resources res = context.getResources();
         LatinIME.sKeyboardSettings.initPrefs(mPrefs, res);
-        for (String key : new String[]{"pref_key_effect", "pref_key_press_effect",
+        for (String key : new String[]{"pref_key_effect", "pref_key_effect_speed",
+                "pref_key_effect_intensity", "pref_key_accent", "pref_key_press_effect",
                 "pref_key_rgb_mode", "pref_key_rgb_speed", "pref_key_rgb_hue",
                 "pref_key_rgb_brightness", "pref_key_overrides", "pref_keyboard_layout",
                 "pref_key_layout", "pref_key_glyphs", "pref_key_font", "pref_key_text_color",
@@ -91,6 +92,11 @@ public class KeyboardPreview extends FrameLayout {
         mInner.applyCustomization(tuning.heightScale, tuning.radiusDp, tuning.backgroundDim);
         mInner.applyKeyOpacity(tuning.keyOpacity);
         mInner.applyKeyShadow(tuning.keyShadow);
+        float shadowBlur = prefFloat("pref_key_shadow_blur", 0f);
+        mInner.applyKeyShadowBlur(shadowBlur);
+        mInner.applyBackgroundEffect(
+                prefFloat("pref_key_effect_speed", 1f),
+                prefFloat("pref_key_effect_intensity", 85f) / 100f);
         int bg = BackgroundImages.selected(context);
         if (bg > 0) {
             Drawable art = context.getDrawable(BackgroundImages.DRAWABLES[bg]);

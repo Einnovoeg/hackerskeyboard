@@ -11,8 +11,8 @@ android {
         applicationId 'org.pocketworkstation.pckeyboard'
         minSdk 27
         targetSdk 37
-        versionCode 3000001
-        versionName '3.0.1'
+        versionCode 3000002
+        versionName '3.0.2'
 
         externalNativeBuild {
             cmake {

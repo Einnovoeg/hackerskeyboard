@@ -68,6 +68,8 @@ public class KeyboardPreviewPreference extends Preference
         if (key.equals("pref_keyboard_layout") || key.equals("pref_key_layout")
                 || key.equals(BackgroundImages.PREF)
                 || key.equals("pref_key_effect") || key.equals("pref_background_dim")
+                || key.equals("pref_key_effect_speed") || key.equals("pref_key_effect_intensity")
+                || key.equals("pref_key_accent") || key.equals("pref_key_shadow_blur")
                 || key.equals("pref_key_radius") || key.equals("pref_key_opacity")
                 || key.equals("pref_key_shadow") || key.equals("pref_key_glyphs")
                 || key.equals("pref_key_font") || key.equals("pref_key_text_color")

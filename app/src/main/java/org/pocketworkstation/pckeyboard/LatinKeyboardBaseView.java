@@ -33,6 +33,7 @@ import android.graphics.Paint.Align;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.LinearGradient;
+import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Region.Op;
@@ -234,6 +235,15 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     public static final int EFFECT_BEAMS = 13;
     public static final int EFFECT_FLOW = 14;
     public static final int EFFECT_CONSTELLATION = 15;
+    public static final int EFFECT_LAVA = 16;
+    public static final int EFFECT_TIDES = 17;
+    public static final int EFFECT_METEORS = 18;
+
+    /** Accent colours for press effects; index 0 follows the active theme. */
+    private static final int[] KEY_ACCENTS = {
+            0, 0xFF4FC3F7, 0xFF4DD0A8, 0xFFB388FF,
+            0xFFFFC247, 0xFFFF5370, 0xFFFF7AC8, 0xFFD9DDE7
+    };
 
     private static final char[] MATRIX_ALPHABET =
             "01010101ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ<>[]{}/\\=+*#$%&@".toCharArray();
@@ -262,7 +272,12 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     private float mKeyCornerRadius;
     private float mKeyShadowDy;
     private float mShadowScale = 1f;
+    private float mShadowSoftnessDp = 0f;
     private float mKeyOpacity = 1f;
+    private float mEffectSpeed = 1f;
+    private float mEffectIntensity = 0.85f;
+    private long mEffectVirtualTime;
+    private long mEffectLastRealTime;
 
     /** Key cap solidity, 0.4-1.0; background art shows through lower values. */
     public void applyKeyOpacity(float opacity) {
@@ -276,6 +291,41 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         mShadowScale = Math.max(0f, Math.min(2f, scale));
         mKeyShadowDy = 2 * getResources().getDisplayMetrics().density * mShadowScale;
         invalidate();
+    }
+
+    /** Softens the raised-key shadow by spreading it over several translucent layers. */
+    public void applyKeyShadowBlur(float softnessDp) {
+        mShadowSoftnessDp = Math.max(0f, Math.min(16f, softnessDp));
+        invalidate();
+    }
+
+    /** Background animation speed multiplier and composite opacity. */
+    public void applyBackgroundEffect(float speed, float intensity) {
+        mEffectSpeed = Math.max(0.2f, Math.min(3f, speed));
+        mEffectIntensity = Math.max(0.1f, Math.min(1f, intensity));
+        invalidate();
+    }
+
+    /**
+     * Time used only by the background effects. Scaling elapsed real time instead of
+     * scaling each effect keeps every animation continuous when the speed changes.
+     */
+    private long effectTime() {
+        long real = System.currentTimeMillis();
+        if (mEffectLastRealTime == 0) {
+            mEffectVirtualTime = real;
+        } else {
+            long delta = Math.max(0, real - mEffectLastRealTime);
+            mEffectVirtualTime += Math.round(delta * mEffectSpeed);
+        }
+        mEffectLastRealTime = real;
+        return mEffectVirtualTime;
+    }
+
+    private int accentColor() {
+        int accent = LatinIME.sKeyboardSettings == null
+                ? 0 : LatinIME.sKeyboardSettings.keyAccent;
+        return accent > 0 && accent < KEY_ACCENTS.length ? KEY_ACCENTS[accent] : 0;
     }
 
     private void updateKeyCapAlpha() {
@@ -1224,8 +1274,13 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
             drawWoodGrain(canvas, 0, 0, getWidth(), getHeight(), 64);
         }
         syncBackgroundImage();
-        if (isEffectEnabled()) {
+        if (isEffectEnabled() && mEffectIntensity > 0.02f) {
+            final int effectAlpha = Math.round(255 * mEffectIntensity);
+            final int layer = effectAlpha < 255
+                    ? canvas.saveLayerAlpha(0, 0, getWidth(), getHeight(), effectAlpha)
+                    : canvas.save();
             drawBackgroundEffect(canvas);
+            canvas.restoreToCount(layer);
         }
         if (mBackgroundDim > 0.01f) {
             mEffectPaint.setStyle(Paint.Style.FILL);
@@ -1346,10 +1401,21 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
             final int keyStyle = LatinIME.sKeyboardSettings.keyStyle;
             final boolean drawableKey = key.codes.length > 0 || key.icon != null || key.label != null;
             if (drawableKey && keyStyle == LatinIME.KEY_STYLE_RAISED) {
-                // Cast a soft shadow below the cap so the keys read as raised. This is
-                // barely visible on dark themes, which is what the bevel below is for.
-                mKeyRect.set(1, mKeyShadowDy + 1, key.width - 1, key.height + mKeyShadowDy);
-                canvas.drawRoundRect(mKeyRect, mKeyCornerRadius, mKeyCornerRadius, mKeyShadowPaint);
+                // Cast a soft shadow below the cap so the keys read as raised. The
+                // softness setting spreads it over progressively larger, fainter layers.
+                final float density = getResources().getDisplayMetrics().density;
+                final float blur = mShadowSoftnessDp * density;
+                final int layers = blur > 0.5f ? 4 : 1;
+                for (int layer = layers; layer >= 1; layer--) {
+                    final float spread = layers == 1 ? 0f : blur * layer / layers;
+                    final int alpha = layers == 1 ? 0x42 : Math.max(7, 0x30 / layer);
+                    mKeyShadowPaint.setColor(alpha << 24);
+                    mKeyRect.set(1 - spread * 0.16f, mKeyShadowDy + 1,
+                            key.width - 1 + spread * 0.16f,
+                            key.height + mKeyShadowDy + spread);
+                    canvas.drawRoundRect(mKeyRect, mKeyCornerRadius + spread * 0.5f,
+                            mKeyCornerRadius + spread * 0.5f, mKeyShadowPaint);
+                }
             }
             keyBackground.draw(canvas);
             if (rgbColor != 0) {
@@ -1780,8 +1846,12 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
             return Color.HSVToColor((int) (220 * fade),
                     new float[]{hue, 0.9f, 1f});
         }
+        final int accent = accentColor();
         final int base;
-        switch (effect) {
+        if (accent != 0 && effect != 5) {
+            // A user accent replaces the per-effect palette; rainbow flash stays a rainbow.
+            base = accent;
+        } else switch (effect) {
             case 2: base = 0xFF4FC3F7; break;  // ripple
             case 3: base = 0xFFFF4FD8; break;  // neon edge
             case 4: base = 0xFFFFB74D; break;  // sparks
@@ -1994,6 +2064,15 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
             case EFFECT_CONSTELLATION:
                 drawConstellation(canvas);
                 break;
+            case EFFECT_LAVA:
+                drawLavaLamp(canvas);
+                break;
+            case EFFECT_TIDES:
+                drawTidalWaves(canvas);
+                break;
+            case EFFECT_METEORS:
+                drawMeteorShower(canvas);
+                break;
             default:
                 break;
         }
@@ -2006,7 +2085,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     /** Warm drifting motes, each on its own slow orbit. */
     private void drawFireflies(Canvas canvas) {
         fillBase(canvas, 0xFF070A05);
-        final long t = System.currentTimeMillis();
+        final long t = effectTime();
         final int count = 26;
         ensureParticles(count);
         final float w = getWidth();
@@ -2027,7 +2106,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     /** Slow plasma bands drifting across the panel. */
     private void drawPlasma(Canvas canvas) {
         fillBase(canvas, 0xFF08030F);
-        final long t = System.currentTimeMillis();
+        final long t = effectTime();
         final float w = getWidth();
         final float h = getHeight();
         if (w <= 0 || h <= 0) return;
@@ -2047,7 +2126,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     /** Falling snow with a gentle sideways drift. */
     private void drawSnow(Canvas canvas) {
         fillBase(canvas, 0xFF0A1018);
-        final long t = System.currentTimeMillis();
+        final long t = effectTime();
         final int count = 90;
         ensureParticles(count);
         final float w = getWidth();
@@ -2066,7 +2145,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     /** Rotating spiral arms around the panel centre. */
     private void drawVortex(Canvas canvas) {
         fillBase(canvas, 0xFF05010A);
-        final long t = System.currentTimeMillis();
+        final long t = effectTime();
         final float cx = getWidth() / 2f;
         final float cy = getHeight() / 2f;
         if (cx <= 0 || cy <= 0) return;
@@ -2091,7 +2170,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     /** Expanding rings rising from the bottom edge, like water disturbed in the dark. */
     private void drawRipples(Canvas canvas) {
         fillBase(canvas, 0xFF04141A);
-        final long t = System.currentTimeMillis();
+        final long t = effectTime();
         final float w = getWidth();
         final float h = getHeight();
         if (w <= 0 || h <= 0) return;
@@ -2116,7 +2195,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     /** Slow searchlight beams sweeping across the panel from below. */
     private void drawLightBeams(Canvas canvas) {
         fillBase(canvas, 0xFF080611);
-        final long t = System.currentTimeMillis();
+        final long t = effectTime();
         final float w = getWidth();
         final float h = getHeight();
         if (w <= 0 || h <= 0) return;
@@ -2151,7 +2230,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     /** Silky ribbons of colour drifting sideways over a deep base. */
     private void drawLiquidFlow(Canvas canvas) {
         fillBase(canvas, 0xFF040A0E);
-        final long t = System.currentTimeMillis();
+        final long t = effectTime();
         final float w = getWidth();
         final float h = getHeight();
         if (w <= 0 || h <= 0) return;
@@ -2176,7 +2255,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     /** Faint stars joined into a slowly drifting constellation. */
     private void drawConstellation(Canvas canvas) {
         fillBase(canvas, 0xFF05070E);
-        final long t = System.currentTimeMillis();
+        final long t = effectTime();
         final float w = getWidth();
         final float h = getHeight();
         if (w <= 0 || h <= 0) return;
@@ -2205,6 +2284,87 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
             float twinkle = (float) (0.5 + 0.5 * Math.sin(t / 900.0 + i * 1.7));
             mEffectPaint.setColor(((int) (110 + 140 * twinkle) << 24) | 0x00E8F2FF);
             canvas.drawCircle(xs[i], ys[i], 1.4f + 1.8f * twinkle, mEffectPaint);
+        }
+    }
+
+    /** Slow, luminous blobs folding into each other over a dark base. */
+    private void drawLavaLamp(Canvas canvas) {
+        fillBase(canvas, 0xFF10040B);
+        final float w = getWidth();
+        final float h = getHeight();
+        if (w <= 0 || h <= 0) return;
+        final long t = effectTime();
+        final int accent = accentColor();
+        final int[] palette = accent != 0
+                ? new int[]{accent, 0xFFFF7A59, 0xFF9B6BFF}
+                : new int[]{0xFFFF7A59, 0xFFFFB347, 0xFF9B6BFF};
+        mEffectPaint.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < 7; i++) {
+            float cx = (float) ((0.5 + 0.38 * Math.sin(t / 4100.0 + i * 1.7)) * w);
+            float cy = (float) ((0.5 + 0.38 * Math.cos(t / 5300.0 + i * 2.1)) * h);
+            float radius = Math.max(w, h) * (0.12f + 0.04f * (float) Math.sin(t / 2700.0 + i));
+            int c = palette[i % palette.length];
+            mEffectPaint.setShader(new RadialGradient(cx, cy, radius,
+                    Color.argb(150, Color.red(c), Color.green(c), Color.blue(c)),
+                    0x00000000, Shader.TileMode.CLAMP));
+            canvas.drawCircle(cx, cy, radius, mEffectPaint);
+        }
+        mEffectPaint.setShader(null);
+    }
+
+    /** Layered sine waves rolling across the panel. */
+    private void drawTidalWaves(Canvas canvas) {
+        fillBase(canvas, 0xFF031018);
+        final float w = getWidth();
+        final float h = getHeight();
+        if (w <= 0 || h <= 0) return;
+        final long t = effectTime();
+        final int accent = accentColor();
+        final int first = accent != 0 ? accent : 0xFF4FC3F7;
+        mEffectPaint.setStyle(Paint.Style.STROKE);
+        for (int band = 0; band < 9; band++) {
+            Path path = new Path();
+            float baseY = h * (0.20f + band * 0.085f);
+            for (int step = 0; step <= 40; step++) {
+                float x = w * step / 40f;
+                double y = baseY
+                        + Math.sin(step * 0.30 + t / 1500.0 + band * 0.7) * h * 0.035
+                        + Math.sin(step * 0.11 - t / 2300.0 + band) * h * 0.022;
+                if (step == 0) path.moveTo(x, (float) y); else path.lineTo(x, (float) y);
+            }
+            int color = band == 0 ? first : (band % 2 == 0 ? 0xFF6FE7DD : 0xFF5B8CFF);
+            mEffectPaint.setStrokeWidth(Math.max(1.5f, h * 0.006f));
+            mEffectPaint.setColor(Color.argb(Math.max(30, 150 - band * 12),
+                    Color.red(color), Color.green(color), Color.blue(color)));
+            canvas.drawPath(path, mEffectPaint);
+        }
+    }
+
+    /** Diagonal meteors with glowing heads and fading tails. */
+    private void drawMeteorShower(Canvas canvas) {
+        fillBase(canvas, 0xFF04050C);
+        final float w = getWidth();
+        final float h = getHeight();
+        if (w <= 0 || h <= 0) return;
+        final long t = effectTime();
+        final float density = getResources().getDisplayMetrics().density;
+        final int accent = accentColor();
+        final int tint = accent != 0 ? accent : 0xFFBFE4FF;
+        mEffectPaint.setStyle(Paint.Style.STROKE);
+        for (int i = 0; i < 26; i++) {
+            float travel = ((t * (0.10f + (i % 7) * 0.018f) + i * 197f) % (w + h + 500f)) - 250f;
+            float x = travel;
+            float y = (-0.32f * travel + h * (0.15f + (i % 9) * 0.095f)) % (h + 300f);
+            if (y < -100) y += h + 300f;
+            float tail = (42 + (i % 5) * 22) * density;
+            int alpha = 50 + (i % 6) * 22;
+            mEffectPaint.setStrokeWidth((1f + (i % 3) * 0.5f) * density);
+            mEffectPaint.setColor(Color.argb(alpha, Color.red(tint), Color.green(tint), Color.blue(tint)));
+            canvas.drawLine(x - tail, y + tail * 0.62f, x, y, mEffectPaint);
+            mEffectPaint.setStyle(Paint.Style.FILL);
+            mEffectPaint.setColor(Color.argb(220, Color.red(tint), Color.green(tint), Color.blue(tint)));
+            canvas.drawCircle(x, y, 1.7f * density, mEffectPaint);
+            mEffectPaint.setStyle(Paint.Style.STROKE);
         }
     }
 
@@ -2271,7 +2431,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
             }
         }
 
-        final long now = System.currentTimeMillis();
+        final long now = effectTime();
         final float delta = mEffectClock == 0 ? 16 : Math.min(64, now - mEffectClock);
         mEffectClock = now;
 
@@ -2296,7 +2456,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         if (width <= 0 || height <= 0) return;
 
         fillBase(canvas, 0xFF05060A);
-        final long time = System.currentTimeMillis();
+        final long time = effectTime();
         mEffectPaint.setStyle(Paint.Style.FILL);
 
         for (int band = 0; band < 3; band++) {
@@ -2321,7 +2481,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         fillBase(canvas, 0xFF050B14);
 
         final float density = getResources().getDisplayMetrics().density;
-        final long time = System.currentTimeMillis();
+        final long time = effectTime();
         mEffectPaint.setStyle(Paint.Style.STROKE);
         mEffectPaint.setStrokeWidth(1.6f * density);
         for (int i = 0; i < 90; i++) {
@@ -2341,7 +2501,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         fillBase(canvas, 0xFF071018);
 
         final float density = getResources().getDisplayMetrics().density;
-        final long time = System.currentTimeMillis();
+        final long time = effectTime();
         mEffectPaint.setStyle(Paint.Style.STROKE);
         mEffectPaint.setStrokeWidth(1.4f * density);
         for (int i = 0; i < 26; i++) {
@@ -2363,7 +2523,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         fillBase(canvas, 0xFF0B0616);
 
         final float density = getResources().getDisplayMetrics().density;
-        final long time = System.currentTimeMillis();
+        final long time = effectTime();
         final float horizon = height * 0.32f;
 
         mEffectPaint.setStyle(Paint.Style.STROKE);
@@ -2389,7 +2549,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         if (width <= 0 || height <= 0) return;
 
         fillBase(canvas, 0xFF02060A);
-        final long time = System.currentTimeMillis();
+        final long time = effectTime();
         final float sweep = (time % 2400) / 2400f * (height + 240) - 120;
 
         mEffectPaint.setStyle(Paint.Style.FILL);
@@ -2431,7 +2591,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
             }
         }
 
-        final long now = System.currentTimeMillis();
+        final long now = effectTime();
         float delta = mMatrixLastFrame == 0 ? 16 : Math.min(64, now - mMatrixLastFrame);
         mMatrixLastFrame = now;
 

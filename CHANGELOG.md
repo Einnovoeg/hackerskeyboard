@@ -4,6 +4,50 @@ All notable changes to HACK3RS K3YB0ARD are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.2] — 2026-11-17
+
+A look-and-customisation release: a larger high-resolution art and theme catalogue,
+new animated backgrounds with global timing controls, extra key-shaping options,
+and a settings menu rebuilt around grouped, navigable screens.
+
+### Added
+- **Six new themes** — Orchid, Reef, Crimson, Arctic, Graphite and Solar — with
+  matching layouts, key-cap states, colours and previews. The catalogue is now 36.
+- **Eight new 2160 × 4800 background artworks** — Abyss, Solar corona, Orchid
+  bloom, Brushed titanium, Reef light, Volcanic fissures, Arctic ice and Mirage
+  dunes. Backgrounds are bundled at device resolution; the catalogue is now 32.
+- **Three new background animations** — Lava lamp, Tidal waves and Meteor shower —
+  for 18 animated styles in total.
+- **Animation speed** (0.2×–3×) and **animation intensity** (10–100%) controls,
+  applied uniformly through the effect clock and composited layer.
+- **Accent colour** for key-press effects: follow the theme, electric blue, mint,
+  violet, amber, crimson, rose or monochrome.
+- **Key shadow softness** (0–16 dp), implemented as layered translucent shadows so
+  the setting has a visible effect on raised key caps.
+
+### Changed
+- Rebuilt the settings into a clean hub with eight grouped screens: Theme &
+  background, Layout & sizing, Keys & remapping, Typing & prediction, Gesture and
+  key actions, Sounds & haptics, Tools & gamepad, and Advanced. Every control lives
+  on exactly one screen; the expanded full-text search opens the correct screen.
+- Moved key remapping, key shape, behaviour, prediction, speech and system input
+  options out of the old mixed appearance screen. Removed the duplicate background
+  preview and duplicate category headings.
+- Release version is now **3.0.2** (`versionCode 3000002`).
+
+### Verification
+- `:app:testDebugUnitTest` — 17 JVM tests, 0 failures, including updated catalogue
+  parity for 36 themes, 32 backgrounds and 18 effects.
+- `:app:assembleDebug` and `:app:assembleRelease` pass; release APK signed and
+  verified with `apksigner`.
+- On-device checks on a Motorola moto g 2025 (Android 16): the Orchid theme and
+  Abyss background rendered on the live keyboard; the Lava lamp animation moved
+  between captured frames; speed 2.6× and intensity 50% persisted across a process
+  restart; the blue accent and Glow press effect appeared on a touched key; all
+  grouped settings screens opened with their controls present.
+
+[3.0.2]: https://github.com/Einnovoeg/hackerskeyboard/releases/tag/v3.0.2
+
 ## [3.0.1] — 2026-11-17
 
 A focused 3.0 update that turns **Customize keys** into a real per-layer key

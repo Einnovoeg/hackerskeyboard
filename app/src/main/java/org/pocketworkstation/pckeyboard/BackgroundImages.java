@@ -34,6 +34,14 @@ public final class BackgroundImages {
             R.drawable.bg_blossom,
             R.drawable.bg_glacier,
             R.drawable.bg_obsidian,
+            R.drawable.bg_abyss,
+            R.drawable.bg_solaris,
+            R.drawable.bg_orchid,
+            R.drawable.bg_titanium,
+            R.drawable.bg_reef,
+            R.drawable.bg_volcano,
+            R.drawable.bg_arctic,
+            R.drawable.bg_mirage,
     };
 
     private BackgroundImages() {

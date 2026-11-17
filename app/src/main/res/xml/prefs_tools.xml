@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tools and gamepad: productivity tools and the controller surface. -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="prefs_tools"
+    android:title="@string/pref_screen_tools_title">
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_tools"
+        android:title="@string/settings_group_tools">
+
+        <Preference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_clipboard"
+            android:key="pref_clipboard_history"
+            android:persistent="false"
+            android:summary="@string/summary_clipboard_history"
+            android:title="@string/title_clipboard_history" />
+
+        <Preference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_snippets"
+            android:key="pref_snippets"
+            android:persistent="false"
+            android:summary="@string/summary_snippets"
+            android:title="@string/title_snippets" />
+
+        <Preference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_glyph"
+            android:key="pref_macros"
+            android:persistent="false"
+            android:summary="@string/summary_macros"
+            android:title="@string/title_macros" />
+
+        <Preference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_theme"
+            android:key="pref_per_app_themes"
+            android:persistent="false"
+            android:summary="@string/summary_per_app_themes"
+            android:title="@string/title_per_app_themes">
+            <intent
+                android:targetPackage="org.pocketworkstation.pckeyboard"
+                android:targetClass="org.pocketworkstation.pckeyboard.PerAppThemeActivity" />
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_gamepad"
+        android:title="@string/settings_group_gamepad">
+
+        <org.pocketworkstation.pckeyboard.GamepadPreviewPreference android:key="pref_gamepad_preview" />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="0"
+            android:entries="@array/gamepad_glyph_entries"
+            android:entryValues="@array/gamepad_glyph_values"
+            android:icon="@drawable/ic_hk_style"
+            android:key="pref_gamepad_glyphs"
+            android:persistent="true"
+            android:summary="@string/summary_gamepad_glyphs"
+            android:title="@string/title_gamepad_glyphs" />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="-1"
+            android:entries="@array/gamepad_theme_entries"
+            android:entryValues="@array/gamepad_theme_values"
+            android:icon="@drawable/ic_hk_theme"
+            android:key="pref_gamepad_theme"
+            android:persistent="true"
+            android:summary="@string/summary_gamepad_theme"
+            android:title="@string/title_gamepad_theme" />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="-1"
+            android:entries="@array/gamepad_bg_entries"
+            android:entryValues="@array/gamepad_bg_values"
+            android:icon="@drawable/ic_hk_effect"
+            android:key="pref_gamepad_background"
+            android:persistent="true"
+            android:summary="@string/summary_gamepad_background"
+            android:title="@string/title_gamepad_background" />
+
+        <CheckBoxPreference android:layout="@layout/preference_hk"
+            android:defaultValue="false"
+            android:icon="@drawable/ic_hk_render"
+            android:key="pref_gamepad_swap"
+            android:persistent="true"
+            android:summary="@string/summary_gamepad_swap"
+            android:title="@string/title_gamepad_swap" />
+    </PreferenceCategory>
+</PreferenceScreen>

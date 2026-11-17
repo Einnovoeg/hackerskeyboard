@@ -37,6 +37,7 @@
     <string name="title_debugging">Debugging</string>
     <string name="title_input_connection_details">Input connection details</string>
     <string name="title_version">Version</string>
+    <string name="summary_no_editor">No editor has been focused yet</string>
     <string name="title_swipe_gestures">Swipe gestures (experimental)</string>
     <string name="title_hardware_key_actions">Hardware key actions</string>
 
@@ -338,8 +339,18 @@
     <string name="pref_screen_feedback_title">Key feedback settings</string>
     <string name="pref_screen_feedback_title_summary">Configure key sound, vibrate, preview popup etc.</string>
 
-    <string name="pref_screen_view_title">Keyboard customization</string>
-    <string name="pref_screen_view_title_summary">Themes, backgrounds, key styles, gamepad and tools</string>
+    <string name="pref_screen_view_title">Theme &amp; background</string>
+    <string name="pref_screen_view_title_summary">Theme, background art, animations and lighting</string>
+    <string name="pref_screen_layout_title">Layout &amp; sizing</string>
+    <string name="pref_screen_layout_title_summary">Keyboard shape, height, row sizing and display options</string>
+    <string name="pref_screen_keys_title">Keys &amp; remapping</string>
+    <string name="pref_screen_keys_title_summary">Key appearance, touch feedback and custom key actions</string>
+    <string name="pref_screen_typing_title">Typing &amp; prediction</string>
+    <string name="pref_screen_typing_title_summary">Languages, correction, suggestions and voice input</string>
+    <string name="pref_screen_tools_title">Tools &amp; gamepad</string>
+    <string name="pref_screen_tools_title_summary">Clipboard, snippets, macros, per-app themes and gamepad</string>
+    <string name="pref_screen_advanced_title">Advanced</string>
+    <string name="pref_screen_advanced_title_summary">Rendering, input diagnostics and app version</string>
 
     <!-- Description for keyboard theme switcher -->
     <string name="keyboard_layout">Keyboard Theme</string>
@@ -397,6 +408,12 @@
         <item>@string/layout_blossom</item>
         <item>@string/layout_glacier</item>
         <item>@string/layout_obsidian</item>
+        <item>@string/layout_orchid</item>
+        <item>@string/layout_reef</item>
+        <item>@string/layout_crimson</item>
+        <item>@string/layout_arctic</item>
+        <item>@string/layout_graphite</item>
+        <item>@string/layout_solar</item>
 </string-array>
 
     <!--
@@ -437,6 +454,12 @@
         <item>27</item>
         <item>28</item>
         <item>29</item>
+        <item>30</item>
+        <item>31</item>
+        <item>32</item>
+        <item>33</item>
+        <item>34</item>
+        <item>35</item>
 </string-array>
 
     <string name="subtype_mode_keyboard">keyboard</string>
@@ -895,6 +918,9 @@
 
     <string name="title_key_effect">Key background effect</string>
     <string name="default_key_effect">0</string>
+    <string name="default_background_animation_speed">1.0</string>
+    <string name="default_background_animation_intensity">85</string>
+    <string name="default_key_accent">0</string>
     <string-array name="key_effect_entries">
         <item>None</item>
         <item>Matrix rain</item>
@@ -913,6 +939,9 @@
         <item>Light beams</item>
         <item>Liquid flow</item>
         <item>Constellation</item>
+        <item>Lava lamp</item>
+        <item>Tidal waves</item>
+        <item>Meteor shower</item>
 </string-array>
     <string-array name="key_effect_values">
         <item>0</item>
@@ -932,6 +961,9 @@
         <item>13</item>
         <item>14</item>
         <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
 </string-array>
 
     <string name="settings_group_lighting">Lighting &amp; key effects</string>
@@ -1050,11 +1082,23 @@
     </string-array>
 
     <string name="settings_group_appearance">Theme</string>
-    <string name="settings_group_layout">Keys</string>
     <string name="settings_group_tools">Tools</string>
     <string name="settings_group_advanced">Advanced</string>
+    <string name="settings_group_layout">Shape &amp; layout</string>
+    <string name="settings_group_dimensions">Size &amp; scale</string>
+    <string name="settings_group_keys">Key appearance</string>
+    <string name="settings_group_key_shape">Shape &amp; finish</string>
+    <string name="settings_group_remap">Remapping</string>
+    <string name="settings_group_key_behaviour">Key behaviour</string>
+    <string name="settings_group_long_press">Long-press</string>
+    <string name="settings_group_typing">Prediction &amp; correction</string>
+    <string name="settings_group_language">Language &amp; input</string>
+    <string name="settings_group_speech">Speech</string>
+    <string name="settings_group_input">Input behaviour</string>
+    <string name="settings_hub_personalise">Personalise</string>
+    <string name="settings_hub_typing">Typing &amp; feedback</string>
+    <string name="settings_hub_system">Tools &amp; system</string>
 
-    <string name="settings_group_typing">Typing aids</string>
     <string name="settings_group_sound">Sound, vibration and key preview</string>
     <string name="title_terminal_safe">No autocorrect in terminals</string>
     <string name="summary_terminal_safe">Leaves commands alone in Termux, ConnectBot, JuiceSSH and similar</string>
@@ -1135,6 +1179,12 @@
         <item>Blossom</item>
         <item>Glacier</item>
         <item>Obsidian</item>
+        <item>Orchid</item>
+        <item>Reef</item>
+        <item>Crimson</item>
+        <item>Arctic</item>
+        <item>Graphite</item>
+        <item>Solar</item>
 </string-array>
     <string-array name="gamepad_theme_values">
         <item>-1</item>
@@ -1169,6 +1219,12 @@
         <item>27</item>
         <item>28</item>
         <item>29</item>
+        <item>30</item>
+        <item>31</item>
+        <item>32</item>
+        <item>33</item>
+        <item>34</item>
+        <item>35</item>
 </string-array>
     <string-array name="gamepad_bg_entries">
         <item>Same as keyboard</item>
@@ -1232,7 +1288,6 @@
     <string name="settings_group_gamepad">Gamepad</string>
     <string name="settings_group_theme">Theme</string>
     <string name="settings_group_background">Background</string>
-    <string name="settings_group_keys">Keys</string>
     <string name="settings_group_feedback">Input and feedback</string>
     <string name="title_key_height_scale">Keyboard height</string>
     <string name="title_key_radius">Key corner radius</string>
@@ -1273,6 +1328,14 @@
         <item>Blossom haze</item>
         <item>Glacier facets</item>
         <item>Obsidian gold</item>
+        <item>Abyss</item>
+        <item>Solar corona</item>
+        <item>Orchid bloom</item>
+        <item>Brushed titanium</item>
+        <item>Reef light</item>
+        <item>Volcanic fissures</item>
+        <item>Arctic ice</item>
+        <item>Mirage dunes</item>
 </string-array>
     <string-array name="background_image_values">
         <item>0</item><item>1</item><item>2</item><item>3</item><item>4</item><item>5</item>
@@ -1285,6 +1348,14 @@
         <item>22</item>
         <item>23</item>
         <item>24</item>
+        <item>25</item>
+        <item>26</item>
+        <item>27</item>
+        <item>28</item>
+        <item>29</item>
+        <item>30</item>
+        <item>31</item>
+        <item>32</item>
 </string-array>
 
     <string name="background_none">None</string>
@@ -1310,6 +1381,31 @@
     <string name="title_key_shadow">Key shadow depth</string>
     <string name="summary_key_shadow">Lift or flatten the keys with a drop shadow</string>
 
+    <string name="title_background_animation_speed">Animation speed</string>
+    <string name="summary_background_animation_speed">Changes how fast the animated background moves</string>
+    <string name="title_background_animation_intensity">Animation intensity</string>
+    <string name="summary_background_animation_intensity">How strongly the animated layer shows over the background image</string>
+
+    <string name="title_key_accent">Accent colour</string>
+    <string name="summary_key_accent">Colour used by key-press effects and reactive lighting</string>
+    <string-array name="accent_color_entries">
+        <item>Follow theme</item>
+        <item>Electric blue</item>
+        <item>Mint</item>
+        <item>Violet</item>
+        <item>Amber</item>
+        <item>Crimson</item>
+        <item>Rose</item>
+        <item>Monochrome</item>
+    </string-array>
+    <string-array name="accent_color_values">
+        <item>0</item><item>1</item><item>2</item><item>3</item>
+        <item>4</item><item>5</item><item>6</item><item>7</item>
+    </string-array>
+
+    <string name="title_key_shadow_blur">Key shadow softness</string>
+    <string name="summary_key_shadow_blur">Softens raised-key shadows for a lighter, modern look</string>
+
     <string name="layout_aurora" translatable="false">Aurora</string>
     <string name="layout_cyberpunk" translatable="false">Cyberpunk</string>
     <string name="layout_paper" translatable="false">Paper</string>
@@ -1321,6 +1417,12 @@
     <string name="layout_blossom" translatable="false">Blossom</string>
     <string name="layout_glacier" translatable="false">Glacier</string>
     <string name="layout_obsidian" translatable="false">Obsidian</string>
+    <string name="layout_orchid" translatable="false">Orchid</string>
+    <string name="layout_reef" translatable="false">Reef</string>
+    <string name="layout_crimson" translatable="false">Crimson</string>
+    <string name="layout_arctic" translatable="false">Arctic</string>
+    <string name="layout_graphite" translatable="false">Graphite</string>
+    <string name="layout_solar" translatable="false">Solar</string>
     <string name="english_ime_debug_settings" translatable="false">Debug settings</string>
     <string name="prefs_debug_mode" translatable="false">Debug Mode</string>
     <string name="prefs_enable_log">Enable user feedback</string>

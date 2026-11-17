@@ -63,7 +63,8 @@ public class GamepadPanel {
             "wood", "ocean", "forest", "sunset",
             "nebula", "rose", "sandstone", "midnight",
             "aurora", "cyberpunk", "paper", "carbon",
-            "lagoon", "ember", "cobalt", "blossom", "glacier", "obsidian"
+            "lagoon", "ember", "cobalt", "blossom", "glacier", "obsidian",
+            "orchid", "reef", "crimson", "arctic", "graphite", "solar"
     };
 
     private static final int CODE_A = KeyEvent.KEYCODE_BUTTON_A;

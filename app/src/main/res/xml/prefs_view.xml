@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Appearance: Theme, Background, Keys, Input & feedback, Tools, Advanced. -->
+<!-- Appearance: themes, background art, animation and lighting. -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:hk="http://schemas.android.com/apk/res-auto"
     android:key="prefs_view"
-    android:title="@string/pref_screen_view_title" >
+    android:title="@string/pref_screen_view_title">
+
+    <org.pocketworkstation.pckeyboard.KeyboardPreviewPreference android:key="pref_theme_preview" />
 
     <PreferenceCategory android:layout="@layout/preference_hk_category"
         android:key="group_theme"
-        android:title="@string/settings_group_theme" >
-
-        <org.pocketworkstation.pckeyboard.KeyboardPreviewPreference android:key="pref_theme_preview" />
+        android:title="@string/settings_group_theme">
 
         <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
             android:defaultValue="8"
@@ -19,47 +19,72 @@
             android:key="pref_keyboard_layout"
             android:persistent="true"
             android:title="@string/keyboard_layout" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_background"
+        android:title="@string/settings_group_background">
 
         <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="@string/default_key_glyphs"
-            android:entries="@array/key_glyph_entries"
-            android:entryValues="@array/key_glyph_values"
-            android:icon="@drawable/ic_hk_glyph"
-            android:key="pref_key_glyphs"
+            android:defaultValue="@string/default_key_effect"
+            android:entries="@array/key_effect_entries"
+            android:entryValues="@array/key_effect_values"
+            android:icon="@drawable/ic_hk_effect"
+            android:key="pref_key_effect"
             android:persistent="true"
-            android:title="@string/title_key_glyphs" />
+            android:title="@string/title_key_effect" />
 
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="@string/default_key_style"
-            android:entries="@array/key_style_entries"
-            android:entryValues="@array/key_style_values"
-            android:icon="@drawable/ic_hk_style"
-            android:key="pref_key_style"
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_background_animation_speed"
+            hk:minValue="0.2"
+            hk:maxValue="3.0"
+            hk:step="0.1"
+            hk:displayFormat="%.1f×"
+            android:icon="@drawable/ic_hk_effect"
+            android:key="pref_key_effect_speed"
             android:persistent="true"
-            android:title="@string/title_key_style" />
+            android:title="@string/title_background_animation_speed"
+            android:summary="@string/summary_background_animation_speed" />
 
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="@string/default_key_text_color"
-            android:entries="@array/key_text_color_entries"
-            android:entryValues="@array/key_text_color_values"
-            android:icon="@drawable/ic_hk_color"
-            android:key="pref_key_text_color"
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_background_animation_intensity"
+            hk:minValue="10"
+            hk:maxValue="100"
+            hk:step="5"
+            hk:displayFormat="%.0f%%"
+            android:icon="@drawable/ic_hk_effect"
+            android:key="pref_key_effect_intensity"
             android:persistent="true"
-            android:title="@string/title_key_text_color" />
+            android:title="@string/title_background_animation_intensity"
+            android:summary="@string/summary_background_animation_intensity" />
 
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="@string/default_key_font"
-            android:entries="@array/key_font_entries"
-            android:entryValues="@array/key_font_values"
-            android:icon="@drawable/ic_hk_font"
-            android:key="pref_key_font"
+        <Preference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_theme"
+            android:key="pref_background_image"
+            android:persistent="false"
+            android:title="@string/title_background_image"
+            android:summary="@string/summary_background_image">
+            <intent
+                android:targetPackage="org.pocketworkstation.pckeyboard"
+                android:targetClass="org.pocketworkstation.pckeyboard.BackgroundImageActivity" />
+        </Preference>
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="0"
+            hk:minValue="0"
+            hk:maxValue="0.8"
+            hk:step="0.05"
+            hk:asPercent="true"
+            android:icon="@drawable/ic_hk_effect"
+            android:key="pref_background_dim"
             android:persistent="true"
-            android:title="@string/title_key_font" />
+            android:title="@string/title_background_dim"
+            android:summary="@string/summary_background_dim" />
     </PreferenceCategory>
 
     <PreferenceCategory android:layout="@layout/preference_hk_category"
         android:key="group_lighting"
-        android:title="@string/settings_group_lighting" >
+        android:title="@string/settings_group_lighting">
 
         <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
             android:defaultValue="@string/default_key_press_effect"
@@ -70,6 +95,16 @@
             android:persistent="true"
             android:title="@string/title_key_press_effect"
             android:summary="@string/summary_key_press_effect" />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_key_accent"
+            android:entries="@array/accent_color_entries"
+            android:entryValues="@array/accent_color_values"
+            android:icon="@drawable/ic_hk_color"
+            android:key="pref_key_accent"
+            android:persistent="true"
+            android:title="@string/title_key_accent"
+            android:summary="@string/summary_key_accent" />
 
         <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
             android:defaultValue="@string/default_key_rgb_mode"
@@ -114,283 +149,4 @@
             android:persistent="true"
             android:title="@string/title_key_rgb_brightness" />
     </PreferenceCategory>
-
-    <PreferenceCategory android:layout="@layout/preference_hk_category"
-        android:key="group_background"
-        android:title="@string/settings_group_background" >
-
-        <org.pocketworkstation.pckeyboard.KeyboardPreviewPreference android:key="pref_background_preview" />
-
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="@string/default_key_effect"
-            android:entries="@array/key_effect_entries"
-            android:entryValues="@array/key_effect_values"
-            android:icon="@drawable/ic_hk_effect"
-            android:key="pref_key_effect"
-            android:persistent="true"
-            android:title="@string/title_key_effect" />
-
-        <Preference android:layout="@layout/preference_hk"
-            android:icon="@drawable/ic_hk_theme"
-            android:key="pref_background_image"
-            android:persistent="false"
-            android:title="@string/title_background_image"
-            android:summary="@string/summary_background_image">
-            <intent
-                android:targetPackage="org.pocketworkstation.pckeyboard"
-                android:targetClass="org.pocketworkstation.pckeyboard.BackgroundImageActivity" />
-        </Preference>
-
-        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
-            android:defaultValue="0"
-            hk:minValue="0"
-            hk:maxValue="0.8"
-            hk:step="0.05"
-            hk:asPercent="true"
-            android:icon="@drawable/ic_hk_effect"
-            android:key="pref_background_dim"
-            android:persistent="true"
-            android:title="@string/title_background_dim"
-            android:summary="@string/summary_background_dim" />
-    </PreferenceCategory>
-
-    <PreferenceCategory android:layout="@layout/preference_hk_category"
-        android:key="group_keys"
-        android:title="@string/settings_group_keys" >
-
-        <Preference android:layout="@layout/preference_hk"
-            android:icon="@drawable/ic_hk_glyph"
-            android:key="pref_customize_keys"
-            android:persistent="false"
-            android:title="@string/title_customize_keys"
-            android:summary="@string/summary_customize_keys">
-            <intent
-                android:targetPackage="org.pocketworkstation.pckeyboard"
-                android:targetClass="org.pocketworkstation.pckeyboard.KeyCustomizeActivity" />
-        </Preference>
-
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="@string/default_key_layout"
-            android:entries="@array/key_layout_entries"
-            android:entryValues="@array/key_layout_values"
-            android:icon="@drawable/ic_hk_glyph"
-            android:key="pref_key_layout"
-            android:persistent="true"
-            android:title="@string/title_key_layout" />
-
-        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
-            android:defaultValue="1.0"
-            hk:minValue="0.7"
-            hk:maxValue="1.5"
-            hk:step="0.05"
-            hk:asPercent="true"
-            android:icon="@drawable/ic_hk_size"
-            android:key="pref_key_height_scale"
-            android:persistent="true"
-            android:title="@string/title_key_height_scale" />
-
-        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
-            android:defaultValue="10"
-            hk:minValue="0"
-            hk:maxValue="24"
-            hk:step="1"
-            hk:displayFormat="%.0f dp"
-            android:icon="@drawable/ic_hk_style"
-            android:key="pref_key_radius"
-            android:persistent="true"
-            android:title="@string/title_key_radius" />
-
-        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
-            android:defaultValue="100"
-            hk:minValue="40"
-            hk:maxValue="100"
-            hk:step="5"
-            hk:displayFormat="%.0f%%"
-            android:icon="@drawable/ic_hk_style"
-            android:key="pref_key_opacity"
-            android:persistent="true"
-            android:title="@string/title_key_opacity"
-            android:summary="@string/summary_key_opacity" />
-
-        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
-            android:defaultValue="100"
-            hk:minValue="0"
-            hk:maxValue="200"
-            hk:step="10"
-            hk:displayFormat="%.0f%%"
-            android:icon="@drawable/ic_hk_style"
-            android:key="pref_key_shadow"
-            android:persistent="true"
-            android:title="@string/title_key_shadow"
-            android:summary="@string/summary_key_shadow" />
-
-        <CheckBoxPreference android:layout="@layout/preference_hk"
-            android:defaultValue="false"
-            android:icon="@drawable/ic_hk_font"
-            android:key="pref_key_bold"
-            android:persistent="true"
-            android:title="@string/title_key_bold"
-            android:summary="@string/summary_key_bold" />
-
-        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
-            android:defaultValue="0"
-            hk:minValue="0"
-            hk:maxValue="0.2"
-            hk:step="0.02"
-            hk:displayFormat="%.2f em"
-            android:icon="@drawable/ic_hk_font"
-            android:key="pref_key_tracking"
-            android:persistent="true"
-            android:title="@string/title_key_tracking"
-            android:summary="@string/summary_key_tracking" />
-
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="@string/default_hint_mode"
-            android:entries="@array/hint_modes"
-            android:entryValues="@array/hint_modes_values"
-            android:icon="@drawable/ic_hk_glyph"
-            android:key="pref_hint_mode"
-            android:persistent="true"
-            android:title="@string/title_hint_mode" />
-
-        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
-            android:defaultValue="1.0"
-            hk:minValue="0.5"
-            hk:maxValue="2.0"
-            hk:logScale="true"
-            hk:asPercent="true"
-            android:icon="@drawable/ic_hk_size"
-            android:key="pref_label_scale_v2"
-            android:persistent="true"
-            android:title="@string/title_label_scale" />
-
-        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
-            android:defaultValue="1.0"
-            hk:minValue="0.5"
-            hk:maxValue="8.0"
-            hk:logScale="true"
-            hk:asPercent="true"
-            android:icon="@drawable/ic_hk_size"
-            android:key="pref_candidate_scale"
-            android:persistent="true"
-            android:title="@string/title_candidate_scale" />
-
-        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
-            android:defaultValue="1.0"
-            hk:minValue="0.5"
-            hk:maxValue="1.0"
-            hk:step="0.05"
-            hk:asPercent="true"
-            android:icon="@drawable/ic_hk_size"
-            android:key="pref_top_row_scale"
-            android:persistent="true"
-            android:title="@string/title_top_row_scale" />
-
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="@string/default_one_handed"
-            android:entries="@array/one_handed_entries"
-            android:entryValues="@array/one_handed_values"
-            android:icon="@drawable/ic_hk_onehand"
-            android:key="pref_one_handed"
-            android:persistent="true"
-            android:title="@string/title_one_handed" />
-    </PreferenceCategory>
-
-    <PreferenceCategory android:layout="@layout/preference_hk_category"
-        android:key="group_gamepad"
-        android:title="@string/settings_group_gamepad" >
-
-        <org.pocketworkstation.pckeyboard.GamepadPreviewPreference android:key="pref_gamepad_preview" />
-
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="0"
-            android:entries="@array/gamepad_glyph_entries"
-            android:entryValues="@array/gamepad_glyph_values"
-            android:icon="@drawable/ic_hk_style"
-            android:key="pref_gamepad_glyphs"
-            android:persistent="true"
-            android:title="@string/title_gamepad_glyphs"
-            android:summary="@string/summary_gamepad_glyphs" />
-
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="-1"
-            android:entries="@array/gamepad_theme_entries"
-            android:entryValues="@array/gamepad_theme_values"
-            android:icon="@drawable/ic_hk_theme"
-            android:key="pref_gamepad_theme"
-            android:persistent="true"
-            android:title="@string/title_gamepad_theme"
-            android:summary="@string/summary_gamepad_theme" />
-
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="-1"
-            android:entries="@array/gamepad_bg_entries"
-            android:entryValues="@array/gamepad_bg_values"
-            android:icon="@drawable/ic_hk_effect"
-            android:key="pref_gamepad_background"
-            android:persistent="true"
-            android:title="@string/title_gamepad_background"
-            android:summary="@string/summary_gamepad_background" />
-
-        <CheckBoxPreference android:layout="@layout/preference_hk"
-            android:defaultValue="false"
-            android:icon="@drawable/ic_hk_render"
-            android:key="pref_gamepad_swap"
-            android:persistent="true"
-            android:title="@string/title_gamepad_swap"
-            android:summary="@string/summary_gamepad_swap" />
-    </PreferenceCategory>
-
-    <PreferenceCategory android:layout="@layout/preference_hk_category"
-        android:key="group_tools"
-        android:title="@string/settings_group_tools" >
-
-        <Preference android:layout="@layout/preference_hk"
-            android:icon="@drawable/ic_hk_clipboard"
-            android:key="pref_clipboard_history"
-            android:persistent="false"
-            android:title="@string/title_clipboard_history"
-            android:summary="@string/summary_clipboard_history" />
-
-        <Preference android:layout="@layout/preference_hk"
-            android:icon="@drawable/ic_hk_snippets"
-            android:key="pref_snippets"
-            android:persistent="false"
-            android:title="@string/title_snippets"
-            android:summary="@string/summary_snippets" />
-
-        <Preference android:layout="@layout/preference_hk"
-            android:icon="@drawable/ic_hk_glyph"
-            android:key="pref_macros"
-            android:persistent="false"
-            android:title="@string/title_macros"
-            android:summary="@string/summary_macros" />
-
-        <Preference android:layout="@layout/preference_hk"
-            android:icon="@drawable/ic_hk_theme"
-            android:key="pref_per_app_themes"
-            android:persistent="false"
-            android:title="@string/title_per_app_themes"
-            android:summary="@string/summary_per_app_themes">
-            <intent
-                android:targetPackage="org.pocketworkstation.pckeyboard"
-                android:targetClass="org.pocketworkstation.pckeyboard.PerAppThemeActivity" />
-        </Preference>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:layout="@layout/preference_hk_category"
-        android:key="group_advanced"
-        android:title="@string/settings_group_advanced" >
-
-        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
-            android:defaultValue="@string/default_render_mode"
-            android:entries="@array/render_mode_entries"
-            android:entryValues="@array/render_mode_values"
-            android:icon="@drawable/ic_hk_render"
-            android:key="pref_render_mode"
-            android:persistent="true"
-            android:title="@string/title_render_mode" />
-    </PreferenceCategory>
-
 </PreferenceScreen>
