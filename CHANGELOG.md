@@ -4,6 +4,46 @@ All notable changes to HACK3RS K3YB0ARD are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.1] — 2026-11-17
+
+A focused 3.0 update that turns **Customize keys** into a real per-layer key
+remapper and fixes the full-size symbols toggle.
+
+### Added
+- **Vial-style per-layer remapping** for every key on the full 5-row QWERTY,
+  AZERTY and Dvorak boards, the compact board, the standard board and the phone
+  board, including their symbol layers.
+- Each key can be bound to a single character or to a named action: Shift,
+  Backspace, Enter, Space, Tab, Escape, layer switch, settings, emoji, clipboard,
+  voice, next language, Ctrl, Alt, Meta, Fn, arrows, Home, End, Page Up/Down,
+  forward delete, close keyboard, macros and gamepad.
+- An in-keyboard emoji picker for the **Emoji** action.
+- The editor shows the current binding and the original binding for every key,
+  remembers the selected board/layer, and keeps optional label and text-colour
+  styling on top of a binding.
+- Per-key reset and reset-all confirmation. Invalid characters, unknown actions,
+  control characters and multi-character values are rejected in the editor with a
+  visible error instead of being written.
+- Old flat label/output/colour overrides are read as a legacy fallback.
+
+### Fixed
+- The Sym key and every layer-switch remap did nothing on full 5-row layouts
+  because the layout switcher always returned the letters board.
+- A mode-change tap could toggle in both `onPress` and `onKey`, immediately
+  switching back to the previous layer.
+- Added an **ABC** return key to the full symbols board so the symbols layer is no
+  longer a dead end.
+
+### Verification
+- `:app:testDebugUnitTest` and `:app:assembleDebug` pass (17 JVM tests).
+- On-device checks on a Motorola moto g 2025 (Android 16): a letter remapped to
+  another character typed the new character live; a letter remapped to Backspace
+  deleted text; a layer-switch remap opened the symbols board; a symbols-layer
+  remap typed only in symbols while letters stayed unchanged; overrides survived
+  process restart; reset-all cleared the live keyboard.
+
+[3.0.1]: https://github.com/Einnovoeg/hackerskeyboard/releases/tag/v3.0.1
+
 ## [3.0] — 2026-11-15
 
 The largest release of the project: a complete visual refresh, a rebuilt settings
@@ -47,7 +87,8 @@ panel with a hidden tribute.
   colour modes, animation speed, base hue and brightness controls.
 - **Customize keys** editor for per-key labels, output text and text colours,
   covering letters, numbers, symbols and modifiers, with individual and global
-  reset.
+  reset. (3.0.1 replaces the output-text field with real per-layer character and
+  action bindings.)
 
 ### Added — input and workflow
 - Gamepad panel that emits real controller key events (`KEYCODE_BUTTON_*`,

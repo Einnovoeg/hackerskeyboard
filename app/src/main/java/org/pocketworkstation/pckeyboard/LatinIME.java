@@ -256,6 +256,8 @@ public class LatinIME extends InputMethodService implements
     // Modifier keys state
     private ModifierKeyState mShiftKeyState = new ModifierKeyState();
     private ModifierKeyState mSymbolKeyState = new ModifierKeyState();
+    /** Prevents one Sym tap from toggling in both onPress and onKey. */
+    private boolean mModeChangeHandledOnPress;
     private ModifierKeyState mCtrlKeyState = new ModifierKeyState();
     private ModifierKeyState mAltKeyState = new ModifierKeyState();
     private ModifierKeyState mMetaKeyState = new ModifierKeyState();
@@ -276,6 +278,11 @@ public class LatinIME extends InputMethodService implements
     private static final int SPOKEN_PROFILE = 11;
     private static final int MACRO_KEY = -150;
     private static final int GAMEPAD_KEY = -151;
+
+    public static final int CUSTOM_ACTION_EMOJI = 1;
+    public static final int CUSTOM_ACTION_CLIPBOARD = 2;
+    public static final int CUSTOM_ACTION_MACRO = 3;
+    public static final int CUSTOM_ACTION_GAMEPAD = 4;
     private final StringBuilder mSpokenWord = new StringBuilder();
     private ClipboardManager mClipboard;
     private ClipboardManager.OnPrimaryClipChangedListener mClipListener;
@@ -2047,6 +2054,15 @@ public class LatinIME extends InputMethodService implements
     // Implementation of KeyboardViewListener
 
     public void onKey(int primaryCode, int[] keyCodes, int x, int y) {
+        if (mModeChangeHandledOnPress) {
+            mModeChangeHandledOnPress = false;
+            if (mKeyboardSwitcher.getPointerCount() <= 1) {
+                // The layout changed under the finger in onPress. This onKey is
+                // the tail of that same tap, not a newly selected key.
+                mKeyboardSwitcher.onKey(Keyboard.KEYCODE_MODE_CHANGE);
+                return;
+            }
+        }
         mSpeakKeys = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("pref_speak_keys", false);
         speakKey(primaryCode);
@@ -2079,10 +2095,12 @@ public class LatinIME extends InputMethodService implements
                 handleShift();
             break;
         case Keyboard.KEYCODE_MODE_CHANGE:
-            // Symbol key is handled in onPress() when device has distinct
-            // multi-touch panel.
-            if (!distinctMultiTouch)
+            // The same gesture can deliver both onPress and onKey. Only one of
+            // them may toggle, or a tap immediately switches back.
+            if (!mModeChangeHandledOnPress && !distinctMultiTouch) {
                 changeKeyboardMode();
+            }
+            mModeChangeHandledOnPress = false;
             break;
         case LatinKeyboardView.KEYCODE_CTRL_LEFT:
             // Ctrl key is handled in onPress() when device has distinct
@@ -2116,6 +2134,9 @@ public class LatinIME extends InputMethodService implements
             break;
         case GAMEPAD_KEY:
             GamepadPanel.show(this, mKeyboardSwitcher.getInputView());
+            break;
+        case Keyboard.KEYCODE_CUSTOM_ACTION:
+            handleCustomAction(keyCodes);
             break;
         case LatinKeyboardView.KEYCODE_OPTIONS:
             onOptionKeyPressed();
@@ -2213,6 +2234,24 @@ public class LatinIME extends InputMethodService implements
         // Reset after any single keystroke
         mEnteredText = null;
         //mDeadAccentBuffer.clear();  // FIXME
+    }
+
+    private void handleCustomAction(int[] keyCodes) {
+        int action = keyCodes != null && keyCodes.length > 1 ? keyCodes[1] : -1;
+        switch (action) {
+        case CUSTOM_ACTION_EMOJI:
+            EmojiPanel.show(this, mKeyboardSwitcher.getInputView());
+            break;
+        case CUSTOM_ACTION_CLIPBOARD:
+            ClipboardPanel.show(this, mKeyboardSwitcher.getInputView());
+            break;
+        case CUSTOM_ACTION_MACRO:
+            MacroPanel.show(this, mKeyboardSwitcher.getInputView());
+            break;
+        case CUSTOM_ACTION_GAMEPAD:
+            GamepadPanel.show(this, mKeyboardSwitcher.getInputView());
+            break;
+        }
     }
 
     public void onText(CharSequence text) {
@@ -3300,6 +3339,7 @@ public class LatinIME extends InputMethodService implements
             startMultitouchShift();
         } else if (distinctMultiTouch
                 && primaryCode == Keyboard.KEYCODE_MODE_CHANGE) {
+            mModeChangeHandledOnPress = true;
             changeKeyboardMode();
             mSymbolKeyState.onPress();
             mKeyboardSwitcher.setAutoModeSwitchStateMomentary();
@@ -3386,6 +3426,7 @@ public class LatinIME extends InputMethodService implements
         // WARNING: Adding a chording modifier key? Make sure you also
         // edit PointerTracker.isModifierInternal(), otherwise it will
         // force a release event instead of chording.
+        mModeChangeHandledOnPress = false;
     }
 
     // receive ringer mode changes to detect silent mode

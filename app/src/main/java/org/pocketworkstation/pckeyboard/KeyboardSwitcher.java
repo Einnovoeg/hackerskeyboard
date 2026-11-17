@@ -407,6 +407,13 @@ public class KeyboardSwitcher implements
     private KeyboardId getKeyboardId(int mode, int imeOptions, boolean isSymbols) {
         boolean hasVoice = hasVoiceButton(isSymbols);
         if (mFullMode > 0) {
+            // The full-size layouts use their own symbols boards. Previously
+            // this branch always returned the letters layout, which made Sym
+            // (and every remapped layer-switch key) a no-op in 5-row mode.
+            if (isSymbols && mode != MODE_PHONE) {
+                return new KeyboardId(mFullMode == 1 ? KBD_COMPACT_FN : KBD_FULL_FN,
+                        KEYBOARDMODE_SYMBOLS, true, hasVoice);
+            }
             switch (mode) {
             case MODE_TEXT:
             case MODE_URL:
@@ -586,7 +593,7 @@ public class KeyboardSwitcher implements
         return mInputView != null && !mInputView.isInSlidingKeyInput();
     }
 
-    private int getPointerCount() {
+    public int getPointerCount() {
         return mInputView == null ? 0 : mInputView.getPointerCount();
     }
 

@@ -40,8 +40,11 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
   Scanline sweep, Starlight and Shockwave, plus None.
 - **RGB keyboard lighting** — Rainbow, Breathing, Wave, Reactive press and Static
   colour modes, with speed, base hue and brightness controls.
-- **Per-key customisation** — give any letter, number, symbol or modifier its own
-  label, output text and text colour, without editing a layout file.
+- **Vial-style per-layer key remapping** — give any key on any board a different
+  character or a special action (Shift, Backspace, Enter, Space, layer switch,
+  emoji, settings, clipboard, voice, arrows, macros and more), with the current
+  binding shown, per-layer overrides, optional label/colour styling, and individual
+  or global reset.
 
 **Useful extras**
 - Gamepad panel that emits real controller key events, with Xbox/Switch/PlayStation
@@ -63,7 +66,8 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
 
 ### From a release (recommended)
 
-1. Download `hack3rs-keyboard-3.0.apk` from the [Releases](../../releases) page.
+1. Download `hack3rs-keyboard-3.0.1.apk` from the [Releases](../../releases) page.
+   The earlier `hack3rs-keyboard-3.0.apk` remains available on the v3.0 release.
 2. Install it (allow "install unknown apps" for your browser or file manager if
    asked).
 3. Open **HACK3RS K3YB0ARD 3.0** and follow the two setup buttons: enable the
@@ -123,9 +127,9 @@ Settings are grouped, searchable and preview live:
 - **Key behaviour** — auto-capitalisation, auto-correct, double-space period,
   chording, long-press behaviour.
 - **Keyboard customization** — theme, key glyphs/style/colour/font, 24 background
-  images, 15 animations, key-press effects, RGB lighting, per-key overrides,
-  dimming, key radius, opacity, shadow, scaling, one-handed mode and gamepad
-  appearance.
+  images, 15 animations, key-press effects, RGB lighting, per-layer key
+  remapping, dimming, key radius, opacity, shadow, scaling, one-handed mode and
+  gamepad appearance.
 - **Input and feedback** — key sounds, haptics and spoken feedback.
 - **Gamepad** — glyph set, pad theme, pad background, swap sides, live preview.
 - **Tools** — clipboard history, text snippets, macros, per-app themes.
@@ -188,4 +192,5 @@ Bug reports, feature requests and pull requests are welcome. Please read
 [CONTRIBUTING](docs/CONTRIBUTING.md) first, keep changes focused, and test on a real
 device where you can.
 
-See [CHANGELOG.md](CHANGELOG.md) for the full 3.0 release notes.
+See [CHANGELOG.md](CHANGELOG.md) for the full 3.0 release notes and the 3.0.1
+key-remapping update.

@@ -75,9 +75,18 @@ controls how long alternate characters take to appear.
   tinting across the key caps.
 - **RGB animation speed, base colour and brightness** — tune the RGB animation to
   the theme and room.
-- **Customize keys** — open the per-key editor to set a label, output text and text
-  colour for any letter, number, symbol or modifier. Changes apply to the live
-  keyboard immediately; individual keys or everything can be reset.
+- **Customize keys** — open the per-layer remapper. Choose a board (full QWERTY,
+  AZERTY, Dvorak, compact, standard or phone) and a layer, then change any key's
+  binding to a single character or a named action. The list shows the current and
+  original binding for each key. Optional label and text-colour styling sits on top
+  of the binding. Changes apply to the live keyboard immediately; individual keys
+  or everything can be reset. Invalid values are rejected with a visible error.
+
+  Bindable actions include Shift, Backspace, Enter, Space, Tab, Escape, layer
+  switch, settings, emoji, clipboard, voice input, next language, Ctrl, Alt, Meta,
+  Fn, arrow keys, Home, End, Page Up/Down, forward delete, close keyboard, macros
+  and the gamepad panel. The full symbols board also has an **ABC** key to return
+  to letters.
 
 ### Gamepad
 

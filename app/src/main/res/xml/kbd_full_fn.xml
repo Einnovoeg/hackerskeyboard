@@ -273,6 +273,10 @@
             android:keyEdgeFlags="left" 
             android:isModifier="true" />
         <Key
+            android:codes="-2"
+            android:keyLabel="ABC"
+            android:isModifier="true" />
+        <Key
             android:codes="@integer/key_settings"
             android:keyIcon="@drawable/sym_keyboard_settings"
             android:iconPreview="@drawable/sym_keyboard_feedback_settings"
@@ -292,7 +296,7 @@
             android:shiftLabel="@string/key_space_shift"
             android:keyIcon="@drawable/sym_keyboard_space"
             android:iconPreview="@drawable/sym_keyboard_feedback_space"
-            android:keyWidth="32.1428571372%p"
+            android:keyWidth="25.000000%p"
             android:isModifier="true" />
         <Key
             android:codes="@integer/key_fn"

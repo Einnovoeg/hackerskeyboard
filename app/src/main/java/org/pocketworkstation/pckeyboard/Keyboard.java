@@ -83,6 +83,8 @@ public class Keyboard {
     public static final int KEYCODE_DONE = -4;
     public static final int KEYCODE_DELETE = -5;
     public static final int KEYCODE_ALT_SYM = -6;
+    // A remapped key whose actual action is carried in the second code.
+    public static final int KEYCODE_CUSTOM_ACTION = -200;
 
     // Backwards compatible setting to avoid having to change all the kbd_qwerty files
     public static final int DEFAULT_LAYOUT_ROWS = 4;
@@ -153,6 +155,8 @@ public class Keyboard {
 
     /** Keyboard mode, or zero, if none.  */
     private int mKeyboardMode;
+    /** Stable per-layout identity used for user key bindings. */
+    private String mLayerId;
     
     private boolean mUseExtension;
 
@@ -263,6 +267,13 @@ public class Keyboard {
          * being the most important.
          */
         public int[] codes;
+
+        /** The layout's key codes before any user remapping was applied. */
+        public int[] originalCodes;
+        /** The layout's label before any user remapping was applied. */
+        public CharSequence originalLabel;
+        /** True when this key's code was replaced by a user binding. */
+        public boolean remapped;
 
         /** Label to display */
         public CharSequence label;
@@ -505,6 +516,12 @@ public class Keyboard {
         }
 
         public int getPrimaryCode(boolean isShiftCaps, boolean isShifted) {
+            if (remapped && codes != null && codes.length > 0) {
+                // A remapped key owns its output completely. In particular,
+                // Shift must not turn a remapped Shift/backspace key into the
+                // first character of its label.
+                return codes[0];
+            }
             if (isDistinctUppercase && isShiftCaps) {
                 return capsLabel.charAt(0);
             }
@@ -847,7 +864,12 @@ public class Keyboard {
         loadKeyboard(context, context.getResources().getXml(xmlLayoutResId));
         setEdgeFlags();
         fixAltChars(LatinIME.sKeyboardSettings.inputLocale);
-        KeyOverrides.apply(context, mKeys);
+        for (Key key : mKeys) {
+            key.originalCodes = key.codes == null ? null : key.codes.clone();
+            key.originalLabel = key.label;
+        }
+        mLayerId = KeyOverrides.layerId(context, xmlLayoutResId, modeId);
+        KeyOverrides.apply(context, mLayerId, mKeys);
     }
 
     /**
@@ -1338,6 +1360,10 @@ public class Keyboard {
             return a.getFraction(index, base, base, defValue);
         }
         return defValue;
+    }
+
+    public String getLayerId() {
+        return mLayerId;
     }
 
     @Override
