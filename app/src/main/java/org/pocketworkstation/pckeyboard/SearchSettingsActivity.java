@@ -29,6 +29,12 @@ public class SearchSettingsActivity extends AppCompatActivity {
             {"Key letter colour", "colour color text label labels letters tint ink", "appearance"},
             {"Key font", "font fonts typeface serif mono cursive roboto", "appearance"},
             {"Key background effect", "effect effects animation animated matrix stars starfield aurora scanlines rain bubbles neon grid fireflies plasma snow vortex ripples beams flow constellation background", "appearance"},
+            {"Key press effect", "press touch glow ripple neon edge spark burst rainbow flash scanline sweep starlight shockwave tap feedback", "appearance"},
+            {"RGB lighting", "rgb lighting light lights colour color rainbow breathing wave reactive static ambient glow keyboard", "appearance"},
+            {"RGB animation speed", "rgb speed animation fast slow lights", "appearance"},
+            {"RGB base colour", "rgb hue colour color palette lights", "appearance"},
+            {"RGB brightness", "rgb brightness intensity dim lights", "appearance"},
+            {"Customize keys", "customize customise keys per-key per key remap remapping vial label labels output text colour color editor", "customize"},
             {"Background image", "background image images wallpaper art photo picture picture art backdrop lagoon ember cobalt blossom glacier obsidian", "appearance"},
             {"Background dim", "dim dimming dimmer brightness dark darken opacity shade background", "appearance"},
             {"Keyboard height", "height heights size tall short scale resize bigger smaller background keys", "appearance"},
@@ -154,7 +160,9 @@ public class SearchSettingsActivity extends AppCompatActivity {
 
     private void open(String destination) {
         Class<?> target;
-        if ("feedback".equals(destination)) {
+        if ("customize".equals(destination)) {
+            target = KeyCustomizeActivity.class;
+        } else if ("feedback".equals(destination)) {
             target = PrefScreenFeedback.class;
         } else if ("actions".equals(destination)) {
             target = PrefScreenActions.class;

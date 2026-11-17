@@ -34,6 +34,7 @@ public class PointerTracker {
 
     public interface UIProxy {
         public void invalidateKey(Key key);
+        public void onKeyPressed(Key key);
         public void showPreview(int keyIndex, PointerTracker tracker);
         public boolean hasDistinctMultitouch();
     }
@@ -256,6 +257,7 @@ public class PointerTracker {
             }
             if (isValidKeyIndex(keyIndex)) {
                 mKeys[keyIndex].onPressed();
+                mProxy.onKeyPressed(mKeys[keyIndex]);
                 mProxy.invalidateKey(mKeys[keyIndex]);
             }
         }

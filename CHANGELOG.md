@@ -41,6 +41,13 @@ panel with a hidden tribute.
   scaling.
 - Gamepad appearance controls with their own theme, background, glyph set and
   left/right swap.
+- Nine selectable key-press effects: Glow, Ripple, Neon edge, Spark burst, Rainbow
+  flash, Scanline sweep, Starlight and Shockwave, plus None.
+- RGB keyboard lighting with Rainbow, Breathing, Wave, Reactive press and Static
+  colour modes, animation speed, base hue and brightness controls.
+- **Customize keys** editor for per-key labels, output text and text colours,
+  covering letters, numbers, symbols and modifiers, with individual and global
+  reset.
 
 ### Added — input and workflow
 - Gamepad panel that emits real controller key events (`KEYCODE_BUTTON_*`,
@@ -88,13 +95,16 @@ panel with a hidden tribute.
 - Personal data, machine paths and build caches are excluded from the repository.
 
 ### Verification
-- `:app:testDebugUnitTest` — 11 JVM tests, 0 failures: tuning parsing/clamping,
-  catalogue counts, entry/value parity and drawable index safety.
+- `:app:testDebugUnitTest` — 12 JVM tests, 0 failures: tuning parsing/clamping,
+  catalogue counts, entry/value parity, press/RGB catalogue counts and drawable
+  index safety.
 - `:app:assembleDebug` and `:app:assembleRelease` build successfully.
 - Release APK is signed and verified with `apksigner`.
 - On-device checks on a Motorola moto g 2025 (Android 16): installation, IME
   activation, typing, settings search, theme/background/animation changes,
-  one-handed left/right modes and rotation, with no crashes or ANRs.
+  key-press effects, RGB modes (including reactive press), per-key label/output/
+  colour overrides, one-handed left/right modes and rotation, with no crashes or
+  ANRs.
 
 ### Known limitations
 - Gesture typing is not implemented.

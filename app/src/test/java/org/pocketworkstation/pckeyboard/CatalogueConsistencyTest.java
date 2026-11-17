@@ -55,6 +55,15 @@ public class CatalogueConsistencyTest {
     }
 
     @Test
+    public void pressAndRgbCataloguesMatchRenderer() {
+        assertEquals(9, countItems("key_press_effect_values"));
+        assertEquals(9, countItems("key_press_effect_entries"));
+        assertEquals(6, countItems("key_rgb_mode_values"));
+        assertEquals(6, countItems("key_rgb_mode_entries"));
+        assertEquals(5, GlobalKeyboardSettings.RGB_STATIC);
+    }
+
+    @Test
     public void backgroundCatalogueMatchesDrawables() {
         assertEquals(BackgroundImages.DRAWABLES.length, countItems("background_image_values"));
         assertEquals(BackgroundImages.DRAWABLES.length, countItems("background_image_entries"));

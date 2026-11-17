@@ -36,6 +36,12 @@ upstream project name is kept in the credits; this fork ships as HACK3RS K3YB0AR
   flow and constellation.
 - Per-element styling: key glyph style, key cap style, key letter colour, font,
   corner radius, opacity, shadow depth, hint colour and label scaling.
+- **Nine key-press effects** — Glow, Ripple, Neon edge, Spark burst, Rainbow flash,
+  Scanline sweep, Starlight and Shockwave, plus None.
+- **RGB keyboard lighting** — Rainbow, Breathing, Wave, Reactive press and Static
+  colour modes, with speed, base hue and brightness controls.
+- **Per-key customisation** — give any letter, number, symbol or modifier its own
+  label, output text and text colour, without editing a layout file.
 
 **Useful extras**
 - Gamepad panel that emits real controller key events, with Xbox/Switch/PlayStation
@@ -117,8 +123,9 @@ Settings are grouped, searchable and preview live:
 - **Key behaviour** — auto-capitalisation, auto-correct, double-space period,
   chording, long-press behaviour.
 - **Keyboard customization** — theme, key glyphs/style/colour/font, 24 background
-  images, 15 animations, dimming, key radius, opacity, shadow, scaling, one-handed
-  mode and gamepad appearance.
+  images, 15 animations, key-press effects, RGB lighting, per-key overrides,
+  dimming, key radius, opacity, shadow, scaling, one-handed mode and gamepad
+  appearance.
 - **Input and feedback** — key sounds, haptics and spoken feedback.
 - **Gamepad** — glyph set, pad theme, pad background, swap sides, live preview.
 - **Tools** — clipboard history, text snippets, macros, per-app themes.
@@ -141,8 +148,8 @@ by name or by keyword (`oled`, `dvorak`, `lagoon`, `confetti`, …).
 - **Tablets and foldables** have only basic layout tuning; per-window-size layouts
   would help.
 - **Accessibility**: the custom-drawn keys expose limited spoken feedback.
-- **Testing** is manual on a Pixel running Android 14/15; wider device coverage is
-  needed.
+- **Testing** is manual on a Motorola moto g 2025 running Android 16; wider device
+  coverage is needed.
 
 If you hit a bug, please [open an issue](../../issues) with your device, Android
 version and steps to reproduce. Contributions are very welcome — especially

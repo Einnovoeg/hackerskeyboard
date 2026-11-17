@@ -934,6 +934,65 @@
         <item>15</item>
 </string-array>
 
+    <string name="settings_group_lighting">Lighting &amp; key effects</string>
+    <string name="title_key_press_effect">Key press effect</string>
+    <string name="summary_key_press_effect">Light each key as you touch it</string>
+    <string name="default_key_press_effect">0</string>
+    <string-array name="key_press_effect_entries">
+        <item>None</item>
+        <item>Glow</item>
+        <item>Ripple</item>
+        <item>Neon edge</item>
+        <item>Spark burst</item>
+        <item>Rainbow flash</item>
+        <item>Scanline sweep</item>
+        <item>Starlight</item>
+        <item>Shockwave</item>
+    </string-array>
+    <string-array name="key_press_effect_values">
+        <item>0</item><item>1</item><item>2</item><item>3</item><item>4</item>
+        <item>5</item><item>6</item><item>7</item><item>8</item>
+    </string-array>
+
+    <string name="title_key_rgb_mode">RGB lighting</string>
+    <string name="summary_key_rgb_mode">Colour the whole key grid, like an RGB keyboard</string>
+    <string name="default_key_rgb_mode">0</string>
+    <string-array name="key_rgb_mode_entries">
+        <item>Off</item>
+        <item>Rainbow</item>
+        <item>Breathing</item>
+        <item>Wave</item>
+        <item>Reactive press</item>
+        <item>Static colour</item>
+    </string-array>
+    <string-array name="key_rgb_mode_values">
+        <item>0</item><item>1</item><item>2</item><item>3</item><item>4</item><item>5</item>
+    </string-array>
+
+    <string name="title_key_rgb_speed">RGB animation speed</string>
+    <string name="default_key_rgb_speed">1.0</string>
+    <string name="title_key_rgb_hue">RGB base colour</string>
+    <string name="default_key_rgb_hue">0</string>
+    <string name="title_key_rgb_brightness">RGB brightness</string>
+    <string name="default_key_rgb_brightness">0.85</string>
+
+    <string name="title_customize_keys">Customize keys</string>
+    <string name="summary_customize_keys">Per-key labels, output text and text colours</string>
+    <string name="key_customize_intro">Change individual keys without editing a layout file. Leave a field blank to use the key\'s default. Output text replaces what the key types; colour accepts #RRGGBB or #AARRGGBB.</string>
+    <string name="key_customize_reset_all">Reset all key customizations</string>
+    <string name="key_customize_reset_all_confirm">Remove every custom key label, output and colour? This cannot be undone.</string>
+    <string name="key_customize_reset_key">Reset this key</string>
+    <string name="key_customize_label">Custom label</string>
+    <string name="key_customize_output">Output text</string>
+    <string name="key_customize_color">Text colour (hex)</string>
+    <string name="key_customize_saved">Key saved</string>
+    <string name="key_customize_invalid_color">Use a colour such as #FF8800</string>
+    <string name="key_customize_empty">No editable keys were found in this layout.</string>
+    <string name="key_customize_code">code %1$d</string>
+    <string name="key_customize_customized">customized</string>
+    <string name="key_customize_edit">Edit</string>
+    <string name="key_customize_default_output">Default output: %1$s</string>
+
     <string name="title_speak_keys">Speak keys</string>
     <string name="summary_speak_keys">Read each key aloud with the system text-to-speech voice</string>
 

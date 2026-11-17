@@ -696,6 +696,7 @@ public class LatinIME extends InputMethodService implements
         //}
         unregisterReceiver(mReceiver);
         unregisterReceiver(mPluginManager);
+        sInstance = null;
         if (mNotificationReceiver != null) {
         	unregisterReceiver(mNotificationReceiver);
             mNotificationReceiver = null;
@@ -754,6 +755,14 @@ public class LatinIME extends InputMethodService implements
      * Called whenever the view gets a new keyboard, including theme and
      * language changes, so the empty side never comes back unexpectedly.
      */
+    /** Called after per-key overrides change so the live keyboard refreshes. */
+    static void refreshKeyOverrides() {
+        LatinIME ime = sInstance;
+        if (ime != null && ime.mKeyboardSwitcher != null) {
+            ime.mKeyboardSwitcher.refreshKeyboards();
+        }
+    }
+
     static void applyOneHanded(View view, Context context) {
         if (view == null) return;
         String mode = PreferenceManager.getDefaultSharedPreferences(context)
@@ -3191,6 +3200,11 @@ public class LatinIME extends InputMethodService implements
                 view.postInvalidateOnAnimation();
             }
         }
+        if (KeyOverrides.PREF.equals(key)) {
+            // Cached keyboards were built before the override existed; force the
+            // next input session to parse the layout again.
+            mKeyboardSwitcher.makeKeyboards(true);
+        }
         if ("pref_one_handed".equals(key)) {
             applyOneHanded(mKeyboardSwitcher.getInputView(), this);
         }
@@ -3481,6 +3495,8 @@ public class LatinIME extends InputMethodService implements
             java.util.Arrays.asList(
                     "pref_key_height_scale", "pref_key_radius", "pref_background_dim",
                     "pref_key_opacity", "pref_key_shadow", "pref_key_effect",
+                    "pref_key_press_effect", "pref_key_rgb_mode", "pref_key_rgb_speed",
+                    "pref_key_rgb_hue", "pref_key_rgb_brightness",
                     BackgroundImages.PREF, "pref_key_style", "pref_key_font",
                     "pref_key_text_color", "pref_key_glyphs", "pref_key_bold",
                     "pref_key_tracking"));

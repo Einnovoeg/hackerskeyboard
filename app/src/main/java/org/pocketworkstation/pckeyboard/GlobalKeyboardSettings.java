@@ -57,6 +57,11 @@ public final class GlobalKeyboardSettings {
     public int keyTextColor = 0;
     public int keyGlyphs = 0;
     public int keyEffect = 0;
+    public int keyPressEffect = 0;
+    public int keyRgbMode = RGB_OFF;
+    public float keyRgbSpeed = 1.0f;
+    public int keyRgbHue = 0;
+    public float keyRgbBrightness = 0.85f;
     public boolean keyBold = false;
     public float keyTracking = 0f;
     public int keyboardTheme = 0;
@@ -109,6 +114,14 @@ public final class GlobalKeyboardSettings {
     // Auto pref implementation follows
     private Map<String, BooleanPref> mBoolPrefs = new HashMap<String, BooleanPref>();
     private Map<String, StringPref> mStringPrefs = new HashMap<String, StringPref>();
+    /** RGB lighting modes. */
+    public static final int RGB_OFF = 0;
+    public static final int RGB_RAINBOW = 1;
+    public static final int RGB_BREATHING = 2;
+    public static final int RGB_WAVE = 3;
+    public static final int RGB_REACTIVE = 4;
+    public static final int RGB_STATIC = 5;
+
     public static final int FLAG_PREF_NONE = 0;
     public static final int FLAG_PREF_NEED_RELOAD = 0x1;
     public static final int FLAG_PREF_NEW_PUNC_LIST = 0x2;
@@ -269,6 +282,45 @@ public final class GlobalKeyboardSettings {
         addStringPref("pref_key_effect", new StringPref() {
             public void set(String val) { keyEffect = Integer.valueOf(val); }
             public String getDefault() { return res.getString(R.string.default_key_effect); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_press_effect", new StringPref() {
+            public void set(String val) { keyPressEffect = Integer.valueOf(val); }
+            public String getDefault() { return res.getString(R.string.default_key_press_effect); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_rgb_mode", new StringPref() {
+            public void set(String val) { keyRgbMode = Integer.valueOf(val); }
+            public String getDefault() { return res.getString(R.string.default_key_rgb_mode); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_rgb_speed", new StringPref() {
+            public void set(String val) {
+                try { keyRgbSpeed = Float.parseFloat(val); }
+                catch (RuntimeException e) { keyRgbSpeed = 1.0f; }
+            }
+            public String getDefault() { return res.getString(R.string.default_key_rgb_speed); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_rgb_hue", new StringPref() {
+            public void set(String val) {
+                try { keyRgbHue = Integer.parseInt(val); }
+                catch (RuntimeException e) { keyRgbHue = 0; }
+            }
+            public String getDefault() { return res.getString(R.string.default_key_rgb_hue); }
+            public int getFlags() { return FLAG_PREF_NONE; }
+        });
+
+        addStringPref("pref_key_rgb_brightness", new StringPref() {
+            public void set(String val) {
+                try { keyRgbBrightness = Float.parseFloat(val); }
+                catch (RuntimeException e) { keyRgbBrightness = 0.85f; }
+            }
+            public String getDefault() { return res.getString(R.string.default_key_rgb_brightness); }
             public int getFlags() { return FLAG_PREF_NONE; }
         });
 

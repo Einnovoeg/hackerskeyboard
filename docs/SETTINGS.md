@@ -67,6 +67,18 @@ controls how long alternate characters take to appear.
 - **One-handed mode** — off, left or right; narrows the keyboard so it can be
   reached with one thumb.
 
+### Lighting and key effects
+
+- **Key press effect** — None, Glow, Ripple, Neon edge, Spark burst, Rainbow flash,
+  Scanline sweep, Starlight or Shockwave accent on each touched key.
+- **RGB lighting** — Off, Rainbow, Breathing, Wave, Reactive press or Static colour
+  tinting across the key caps.
+- **RGB animation speed, base colour and brightness** — tune the RGB animation to
+  the theme and room.
+- **Customize keys** — open the per-key editor to set a label, output text and text
+  colour for any letter, number, symbol or modifier. Changes apply to the live
+  keyboard immediately; individual keys or everything can be reset.
+
 ### Gamepad
 
 - Button glyph set (Xbox, Switch, PlayStation).

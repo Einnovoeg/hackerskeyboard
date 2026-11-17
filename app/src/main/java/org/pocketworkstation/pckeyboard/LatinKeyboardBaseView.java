@@ -67,9 +67,11 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
@@ -377,6 +379,12 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
     private final Rect mDirtyRect = new Rect();
     /** The keyboard bitmap for faster updates */
     private Bitmap mBuffer;
+    /** Recently pressed keys, for press-effect and reactive RGB animation. */
+    private final HashMap<Key, Long> mKeyPressTimes = new HashMap<Key, Long>();
+    private static final long KEY_PRESS_EFFECT_MS = 700L;
+    private final Paint mPressPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint mRgbPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF mPressRect = new RectF();
     /** Notes if the keyboard just changed, so that we could possibly reallocate the mBuffer. */
     private boolean mKeyboardChanged;
     private Key mInvalidatedKey;
@@ -791,6 +799,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         mHandler.cancelKeyTimers();
         mHandler.cancelPopupPreview();
         mKeyboard = keyboard;
+        mKeyPressTimes.clear();
         // Disable correctionX and correctionY, it doesn't seem to work as intended.
         // mKeys = mKeyDetector.setKeyboard(keyboard, -getPaddingLeft(),-getPaddingTop() + mVerticalCorrection);
         mKeys = mKeyDetector.setKeyboard(keyboard, 0, 0);
@@ -846,6 +855,18 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
      */
     public boolean hasDistinctMultitouch() {
         return mHasDistinctMultitouch;
+    }
+
+    @Override
+    public void onKeyPressed(Key key) {
+        if (key == null || mPreviewMode || LatinIME.sKeyboardSettings == null) return;
+        if (LatinIME.sKeyboardSettings.keyPressEffect == 0
+                && LatinIME.sKeyboardSettings.keyRgbMode != GlobalKeyboardSettings.RGB_REACTIVE) {
+            return;
+        }
+        mKeyPressTimes.put(key, SystemClock.uptimeMillis());
+        invalidateAllKeys();
+        postInvalidateOnAnimation();
     }
 
     /**
@@ -1228,6 +1249,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         final int kbdPaddingTop = getPaddingTop();
         final Key[] keys = mKeys;
         final Key invalidKey = mInvalidatedKey;
+        final long effectNow = SystemClock.uptimeMillis();
 
         ColorFilter iconColorFilter = null;
         ColorFilter shadowColorFilter = null;
@@ -1285,7 +1307,12 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
                 continue;
             }
             keysDrawn++;
-            paint.setColor(key.isCursor ? mKeyCursorColor : keyTextColor);
+            final int rgbColor = rgbColorFor(key, effectNow);
+            int labelColor = key.customTextColor != 0 ? key.customTextColor : keyTextColor;
+            if (rgbColor != 0 && key.customTextColor == 0) {
+                labelColor = contrastTextColor(rgbColor);
+            }
+            paint.setColor(key.isCursor ? mKeyCursorColor : labelColor);
 
             int[] drawableState = key.getCurrentDrawableState();
             keyBackground.setState(drawableState);
@@ -1325,6 +1352,13 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
                 canvas.drawRoundRect(mKeyRect, mKeyCornerRadius, mKeyCornerRadius, mKeyShadowPaint);
             }
             keyBackground.draw(canvas);
+            if (rgbColor != 0) {
+                mRgbPaint.setStyle(Paint.Style.FILL);
+                mRgbPaint.setShader(null);
+                mRgbPaint.setColor(rgbColor);
+                mPressRect.set(0, 0, key.width, key.height);
+                canvas.drawRoundRect(mPressRect, mKeyCornerRadius, mKeyCornerRadius, mRgbPaint);
+            }
             if (drawableKey && isWoodTheme()) {
                 canvas.save();
                 canvas.clipRect(0, 0, key.width, key.height);
@@ -1511,6 +1545,7 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
             canvas.translate(-key.x - kbdPaddingLeft, -key.y - kbdPaddingTop);
         }
         //Log.i(TAG, "keysDrawn=" + keysDrawn);
+        drawKeyPressEffects(canvas, kbdPaddingLeft, kbdPaddingTop, effectNow);
         mInvalidatedKey = null;
         // Overlay a dark rectangle to dim the keyboard
         if (mMiniKeyboardVisible) {
@@ -1539,6 +1574,11 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
 
         mDrawPending = false;
         mDirtyRect.setEmpty();
+        if (LatinIME.sKeyboardSettings != null
+                && LatinIME.sKeyboardSettings.keyRgbMode != GlobalKeyboardSettings.RGB_OFF
+                && !mPreviewMode) {
+            postInvalidateOnAnimation();
+        }
     }
 
     // TODO: clean up this method.
@@ -1681,6 +1721,224 @@ public class LatinKeyboardBaseView extends View implements PointerTracker.UIProx
         //onBufferDraw();
         invalidate(key.x + getPaddingLeft(), key.y + getPaddingTop(),
                 key.x + key.width + getPaddingLeft(), key.y + key.height + getPaddingTop());
+    }
+
+    /** Colour of the ambient RGB lighting for one key at the current frame. */
+    private int rgbColorFor(Key key, long now) {
+        final GlobalKeyboardSettings settings = LatinIME.sKeyboardSettings;
+        if (settings == null || settings.keyRgbMode == GlobalKeyboardSettings.RGB_OFF) return 0;
+        final float speed = Math.max(0.2f, Math.min(3f, settings.keyRgbSpeed));
+        final float brightness = Math.max(0.15f, Math.min(1f, settings.keyRgbBrightness));
+        float hue = settings.keyRgbHue;
+        float level = brightness;
+        int alpha;
+        switch (settings.keyRgbMode) {
+            case GlobalKeyboardSettings.RGB_RAINBOW:
+                hue += (key.x * 360f / Math.max(1, mViewWidth)) + (now * 0.04f * speed);
+                alpha = (int) (35 + 110 * brightness);
+                break;
+            case GlobalKeyboardSettings.RGB_BREATHING:
+                level *= 0.55f + 0.45f * (float) Math.sin(now * 0.0025f * speed);
+                alpha = (int) (25 + 135 * level);
+                break;
+            case GlobalKeyboardSettings.RGB_WAVE:
+                hue += key.x * 0.35f + key.y * 0.55f + now * 0.13f * speed;
+                alpha = (int) (30 + 120 * brightness);
+                break;
+            case GlobalKeyboardSettings.RGB_REACTIVE:
+                Long started = mKeyPressTimes.get(key);
+                if (started == null) return 0;
+                long age = now - started;
+                if (age > 420L) return 0;
+                hue += key.x * 0.55f;
+                alpha = (int) (70 + 170 * brightness * (1f - age / 420f));
+                break;
+            case GlobalKeyboardSettings.RGB_STATIC:
+            default:
+                alpha = (int) (35 + 110 * brightness);
+                break;
+        }
+        hue = ((hue % 360f) + 360f) % 360f;
+        return Color.HSVToColor(Math.max(0, Math.min(255, alpha)),
+                new float[]{hue, 0.82f, 1f});
+    }
+
+    /** Picks black or white so a tinted key label stays readable. */
+    private static int contrastTextColor(int color) {
+        int luminance = (299 * Color.red(color) + 587 * Color.green(color)
+                + 114 * Color.blue(color)) / 1000;
+        return luminance > 145 ? 0xFF101010 : 0xFFFFFFFF;
+    }
+
+    /** Colour for a press animation, following the selected RGB palette when on. */
+    private int pressColor(Key key, int effect, float fade, long now) {
+        final GlobalKeyboardSettings settings = LatinIME.sKeyboardSettings;
+        if (settings != null && settings.keyRgbMode != GlobalKeyboardSettings.RGB_OFF) {
+            float hue = settings.keyRgbHue + key.x * 0.6f + now * 0.05f
+                    * Math.max(0.2f, settings.keyRgbSpeed);
+            hue = ((hue % 360f) + 360f) % 360f;
+            return Color.HSVToColor((int) (220 * fade),
+                    new float[]{hue, 0.9f, 1f});
+        }
+        final int base;
+        switch (effect) {
+            case 2: base = 0xFF4FC3F7; break;  // ripple
+            case 3: base = 0xFFFF4FD8; break;  // neon edge
+            case 4: base = 0xFFFFB74D; break;  // sparks
+            case 6: base = 0xFF69F0AE; break;  // scanline
+            case 7: base = 0xFFE1BEE7; break;  // starlight
+            case 8: base = 0xFFFF5252; break;  // shockwave
+            default: base = 0xFF80D8FF; break; // glow and rainbow flash
+        }
+        return Color.argb((int) (220 * fade), Color.red(base), Color.green(base), Color.blue(base));
+    }
+
+    /** Draws the selected touch effect over recently pressed keys. */
+    private void drawKeyPressEffects(Canvas canvas, int padLeft, int padTop, long now) {
+        final GlobalKeyboardSettings settings = LatinIME.sKeyboardSettings;
+        if (settings == null) return;
+        final int effect = settings.keyPressEffect;
+        if (effect == 0 && settings.keyRgbMode != GlobalKeyboardSettings.RGB_REACTIVE) return;
+        if (mKeyPressTimes.isEmpty()) return;
+
+        final float density = getResources().getDisplayMetrics().density;
+        final Iterator<Map.Entry<Key, Long>> iterator = mKeyPressTimes.entrySet().iterator();
+        boolean active = false;
+        while (iterator.hasNext()) {
+            Map.Entry<Key, Long> entry = iterator.next();
+            long age = now - entry.getValue();
+            if (age < 0 || age > KEY_PRESS_EFFECT_MS) {
+                iterator.remove();
+                continue;
+            }
+            active = true;
+            if (effect == 0) continue;
+            final Key key = entry.getKey();
+            if (key == null) continue;
+            final float t = age / (float) KEY_PRESS_EFFECT_MS;
+            final float fade = 1f - t;
+            final float left = padLeft + key.x;
+            final float top = padTop + key.y;
+            final float right = left + key.width;
+            final float bottom = top + key.height;
+            final float cx = (left + right) / 2f;
+            final float cy = (top + bottom) / 2f;
+            final int color = pressColor(key, effect, fade, now);
+            mPressPaint.setShader(null);
+            mPressPaint.setShadowLayer(0, 0, 0, 0);
+
+            switch (effect) {
+                case 1: { // layered glow
+                    mPressPaint.setStyle(Paint.Style.STROKE);
+                    mPressRect.set(left + 1, top + 1, right - 1, bottom - 1);
+                    final int glowAlpha = Color.alpha(color);
+                    for (int layer = 4; layer >= 1; layer--) {
+                        mPressPaint.setStrokeWidth((layer * 2.5f + 1f) * density);
+                        mPressPaint.setColor(Color.argb(glowAlpha / (layer * 3),
+                                Color.red(color), Color.green(color), Color.blue(color)));
+                        canvas.drawRoundRect(mPressRect, mKeyCornerRadius, mKeyCornerRadius,
+                                mPressPaint);
+                    }
+                    break;
+                }
+                case 2: { // ripple
+                    mPressPaint.setStyle(Paint.Style.STROKE);
+                    mPressPaint.setStrokeWidth(2.2f * density);
+                    mPressPaint.setColor(color);
+                    float radius = Math.max(key.width, key.height) * (0.25f + 0.7f * t);
+                    canvas.drawCircle(cx, cy, radius, mPressPaint);
+                    mPressPaint.setAlpha(Math.max(0, Color.alpha(color) / 3));
+                    canvas.drawCircle(cx, cy, radius * 0.72f, mPressPaint);
+                    break;
+                }
+                case 3: { // neon edge
+                    mPressPaint.setStyle(Paint.Style.STROKE);
+                    mPressPaint.setStrokeWidth(2.5f * density);
+                    mPressPaint.setColor(color);
+                    float inset = 1.5f * density + 3f * density * t;
+                    mPressRect.set(left + inset, top + inset, right - inset, bottom - inset);
+                    canvas.drawRoundRect(mPressRect, mKeyCornerRadius, mKeyCornerRadius, mPressPaint);
+                    mPressPaint.setAlpha(Math.max(0, Color.alpha(color) / 3));
+                    mPressRect.inset(-2 * density, -2 * density);
+                    canvas.drawRoundRect(mPressRect, mKeyCornerRadius, mKeyCornerRadius, mPressPaint);
+                    break;
+                }
+                case 4: { // spark burst
+                    mPressPaint.setStyle(Paint.Style.FILL);
+                    final int seed = Math.abs(key.hashCode());
+                    for (int i = 0; i < 8; i++) {
+                        double angle = (seed % 31 + i * 47) * Math.PI / 180.0;
+                        float distance = (0.15f + 0.7f * t) * Math.max(key.width, key.height) * 0.55f;
+                        float px = cx + (float) Math.cos(angle) * distance;
+                        float py = cy + (float) Math.sin(angle) * distance - 4 * density * t;
+                        mPressPaint.setColor(color);
+                        mPressPaint.setAlpha(Math.max(0, Color.alpha(color) - (int) (120 * t)));
+                        canvas.drawCircle(px, py, Math.max(1f, 2.6f * density * fade), mPressPaint);
+                    }
+                    break;
+                }
+                case 5: { // rainbow flash
+                    float hue = ((now * 0.35f + key.x * 0.7f) % 360f + 360f) % 360f;
+                    mPressPaint.setStyle(Paint.Style.FILL);
+                    mPressPaint.setColor(Color.HSVToColor((int) (55 * fade),
+                            new float[]{hue, 0.9f, 1f}));
+                    mPressRect.set(left + 1, top + 1, right - 1, bottom - 1);
+                    canvas.drawRoundRect(mPressRect, mKeyCornerRadius, mKeyCornerRadius, mPressPaint);
+                    mPressPaint.setStyle(Paint.Style.STROKE);
+                    mPressPaint.setStrokeWidth(2.5f * density);
+                    mPressPaint.setColor(Color.HSVToColor((int) (210 * fade),
+                            new float[]{hue, 0.9f, 1f}));
+                    canvas.drawRoundRect(mPressRect, mKeyCornerRadius, mKeyCornerRadius, mPressPaint);
+                    break;
+                }
+                case 6: { // scanline sweep
+                    canvas.save();
+                    mPressRect.set(left, top, right, bottom);
+                    canvas.clipRect(mPressRect);
+                    float y = top + (bottom - top) * t;
+                    mPressPaint.setStyle(Paint.Style.FILL);
+                    mPressPaint.setColor(color);
+                    canvas.drawRect(left, y - 1.5f * density, right, y + 1.5f * density, mPressPaint);
+                    mPressPaint.setAlpha(Math.max(0, Color.alpha(color) / 4));
+                    canvas.drawRect(left, y - 5 * density, right, y + 5 * density, mPressPaint);
+                    canvas.restore();
+                    break;
+                }
+                case 7: { // starlight
+                    mPressPaint.setStyle(Paint.Style.FILL);
+                    final int seed = Math.abs(key.hashCode());
+                    for (int i = 0; i < 6; i++) {
+                        float px = left + key.width * (0.15f + 0.7f * ((seed + i * 37) % 100) / 100f);
+                        float py = top + key.height * (0.15f + 0.7f * ((seed + i * 61) % 100) / 100f);
+                        mPressPaint.setColor(color);
+                        mPressPaint.setAlpha(Math.max(0, Color.alpha(color)
+                                * (i % 2 == 0 ? 1 : 2) / 3));
+                        float radius = (1.2f + 2.2f * (float) Math.abs(Math.sin(now / 160f + i)))
+                                * density * fade;
+                        canvas.drawCircle(px, py, Math.max(0.6f, radius), mPressPaint);
+                    }
+                    break;
+                }
+                case 8: { // shockwave
+                    mPressPaint.setStyle(Paint.Style.STROKE);
+                    mPressPaint.setStrokeWidth(2f * density);
+                    mPressPaint.setColor(color);
+                    float grow = 10f * density * t;
+                    mPressRect.set(left - grow, top - grow, right + grow, bottom + grow);
+                    canvas.drawRoundRect(mPressRect, mKeyCornerRadius + grow,
+                            mKeyCornerRadius + grow, mPressPaint);
+                    mPressPaint.setAlpha(Math.max(0, Color.alpha(color) / 3));
+                    mPressRect.inset(-5 * density * t, -5 * density * t);
+                    canvas.drawRoundRect(mPressRect, mKeyCornerRadius + grow,
+                            mKeyCornerRadius + grow, mPressPaint);
+                    break;
+                }
+                default:
+                    break;
+            }
+            mPressPaint.setShadowLayer(0, 0, 0, 0);
+        }
+        if (active && !mPreviewMode) postInvalidateOnAnimation();
     }
 
     private boolean isEffectEnabled() {

@@ -48,7 +48,9 @@ public class KeyboardPreview extends FrameLayout {
         // Refresh the shared settings the keyboard renderer reads, from the same prefs.
         Resources res = context.getResources();
         LatinIME.sKeyboardSettings.initPrefs(mPrefs, res);
-        for (String key : new String[]{"pref_key_effect", "pref_keyboard_layout",
+        for (String key : new String[]{"pref_key_effect", "pref_key_press_effect",
+                "pref_key_rgb_mode", "pref_key_rgb_speed", "pref_key_rgb_hue",
+                "pref_key_rgb_brightness", "pref_key_overrides", "pref_keyboard_layout",
                 "pref_key_layout", "pref_key_glyphs", "pref_key_font", "pref_key_text_color",
                 "pref_key_bold", "pref_label_scale_v2", "pref_key_height_scale",
                 "pref_top_row_scale"}) {

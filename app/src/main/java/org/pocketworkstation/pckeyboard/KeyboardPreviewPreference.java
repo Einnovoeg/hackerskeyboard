@@ -73,6 +73,9 @@ public class KeyboardPreviewPreference extends Preference
                 || key.equals("pref_key_font") || key.equals("pref_key_text_color")
                 || key.equals("pref_key_bold") || key.equals("pref_key_height_scale")
                 || key.equals("pref_key_style") || key.equals("pref_key_tracking")
+                || key.equals("pref_key_press_effect") || key.equals("pref_key_rgb_mode")
+                || key.equals("pref_key_rgb_speed") || key.equals("pref_key_rgb_hue")
+                || key.equals("pref_key_rgb_brightness") || key.equals("pref_key_overrides")
                 || key.equals("pref_label_scale_v2") || key.equals("pref_top_row_scale")
                 || key.equals("pref_candidate_scale") || key.equals("pref_hint_mode")) {
             mPreview.post(mPreview::reload);

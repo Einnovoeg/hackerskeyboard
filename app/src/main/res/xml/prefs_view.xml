@@ -58,6 +58,64 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:layout="@layout/preference_hk_category"
+        android:key="group_lighting"
+        android:title="@string/settings_group_lighting" >
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_key_press_effect"
+            android:entries="@array/key_press_effect_entries"
+            android:entryValues="@array/key_press_effect_values"
+            android:icon="@drawable/ic_hk_effect"
+            android:key="pref_key_press_effect"
+            android:persistent="true"
+            android:title="@string/title_key_press_effect"
+            android:summary="@string/summary_key_press_effect" />
+
+        <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_key_rgb_mode"
+            android:entries="@array/key_rgb_mode_entries"
+            android:entryValues="@array/key_rgb_mode_values"
+            android:icon="@drawable/ic_hk_color"
+            android:key="pref_key_rgb_mode"
+            android:persistent="true"
+            android:title="@string/title_key_rgb_mode"
+            android:summary="@string/summary_key_rgb_mode" />
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_key_rgb_speed"
+            hk:minValue="0.2"
+            hk:maxValue="3.0"
+            hk:step="0.1"
+            hk:displayFormat="%.1f×"
+            android:icon="@drawable/ic_hk_effect"
+            android:key="pref_key_rgb_speed"
+            android:persistent="true"
+            android:title="@string/title_key_rgb_speed" />
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_key_rgb_hue"
+            hk:minValue="0"
+            hk:maxValue="360"
+            hk:step="10"
+            hk:displayFormat="%.0f°"
+            android:icon="@drawable/ic_hk_color"
+            android:key="pref_key_rgb_hue"
+            android:persistent="true"
+            android:title="@string/title_key_rgb_hue" />
+
+        <org.pocketworkstation.pckeyboard.SeekBarPreferenceString android:layout="@layout/preference_hk"
+            android:defaultValue="@string/default_key_rgb_brightness"
+            hk:minValue="0.15"
+            hk:maxValue="1.0"
+            hk:step="0.05"
+            hk:asPercent="true"
+            android:icon="@drawable/ic_hk_size"
+            android:key="pref_key_rgb_brightness"
+            android:persistent="true"
+            android:title="@string/title_key_rgb_brightness" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/preference_hk_category"
         android:key="group_background"
         android:title="@string/settings_group_background" >
 
@@ -99,6 +157,17 @@
     <PreferenceCategory android:layout="@layout/preference_hk_category"
         android:key="group_keys"
         android:title="@string/settings_group_keys" >
+
+        <Preference android:layout="@layout/preference_hk"
+            android:icon="@drawable/ic_hk_glyph"
+            android:key="pref_customize_keys"
+            android:persistent="false"
+            android:title="@string/title_customize_keys"
+            android:summary="@string/summary_customize_keys">
+            <intent
+                android:targetPackage="org.pocketworkstation.pckeyboard"
+                android:targetClass="org.pocketworkstation.pckeyboard.KeyCustomizeActivity" />
+        </Preference>
 
         <org.pocketworkstation.pckeyboard.AutoSummaryListPreference android:layout="@layout/preference_hk"
             android:defaultValue="@string/default_key_layout"

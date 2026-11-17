@@ -85,6 +85,11 @@
                 android:exported="false"
                 android:label="@string/title_per_app_themes" />
 
+        <activity android:name="KeyCustomizeActivity"
+                android:exported="false"
+                android:label="@string/title_customize_keys"
+                android:windowSoftInputMode="adjustResize" />
+
         <activity android:name="MacrosActivity"
                 android:exported="false"
                 android:label="@string/title_macros" 

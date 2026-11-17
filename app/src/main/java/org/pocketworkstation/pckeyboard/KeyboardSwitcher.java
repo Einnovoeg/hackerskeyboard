@@ -667,6 +667,14 @@ public class KeyboardSwitcher implements
         changeLatinKeyboardView(mLayoutId, true);
     }
 
+    /** Rebuilds cached keyboards and refreshes the visible one immediately. */
+    public void refreshKeyboards() {
+        makeKeyboards(true);
+        if (mInputView != null && mMode != MODE_NONE) {
+            setKeyboardMode(mMode, mImeOptions, mHasVoice);
+        }
+    }
+
     private void changeLatinKeyboardView(int newLayout, boolean forceReset) {
         if (mLayoutId != newLayout || mInputView == null || forceReset) {
             if (mInputView != null) {

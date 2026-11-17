@@ -290,6 +290,8 @@ public class Keyboard {
         public int y;
         /** The current pressed state of this key */
         public boolean pressed;
+        /** Optional per-key label colour override; 0 means use the theme. */
+        public int customTextColor = 0;
         /** If this is a sticky key, is it on or locked? */
         public boolean on;
         public boolean locked;
@@ -845,6 +847,7 @@ public class Keyboard {
         loadKeyboard(context, context.getResources().getXml(xmlLayoutResId));
         setEdgeFlags();
         fixAltChars(LatinIME.sKeyboardSettings.inputLocale);
+        KeyOverrides.apply(context, mKeys);
     }
 
     /**
